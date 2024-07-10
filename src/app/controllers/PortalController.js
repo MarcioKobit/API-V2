@@ -1,5 +1,6 @@
 // import { Console } from 'console';
 import PortalRepository from '../repositories/PortalRepository.js';
+import UsuarioRepository from '../repositories/UsuarioRepository.js';
 import jwtController from './jwtController.js';
 import auxiliares from '../components/auxiliares.js';
 
@@ -151,11 +152,25 @@ class PortalController {
     }
 
     async storeArquitetos(req, res) {
-        // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
-        if (!wOjJWT[0]) { return false; };
-        const { codempresa, id } = wOjJWT[1]
-        // ####### Validacao do JWT #######
+
+        const jwt = req.headers["authorization"] || req.headers["x-access-token"];
+        const objAPI = await UsuarioRepository.validaToken(jwt);
+
+        if (objAPI.length == 0) {
+            var wArray = {
+                STATUS: false,
+                RECORDS: 1,
+                DATA: [{
+                    MENSAGEM: 'Token Inválido'
+                }]
+            };
+
+            res.json(wArray);
+            return false;
+        }
+
+
+
 
         const corpo = req.body;
         var wArray = {
@@ -164,7 +179,7 @@ class PortalController {
             DATA: []
         };
 
-
+        return false;
         var wArrayData = []
         for (var i = 0; i < corpo.RECORDS; i++) {
             var wOjSenha = jwtController.encrypt(corpo.DATA[i].SENHA);

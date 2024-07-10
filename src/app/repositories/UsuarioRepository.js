@@ -26,6 +26,11 @@ class UsuarioRepository {
         return consulta(sql, [pLogin, pLogin, pSenhaCrpyt], 'Não foi validar usuario!')
     }
 
+    validaToken(pToken) {
+        var sql = "select 1 from integracao where token = ? and situacao = 'A'";
+        return consulta(sql, [pToken], 'Não foi validar usuario!')
+    }
+
     findAll(pCodEmpresa) {
         const sql = "SELECT codusuario, codempresa, nomUsuario, login, senha FROM usuarios where codempresa = ?"
         return consulta(sql, pCodEmpresa, 'Não foi possível localizar!')
