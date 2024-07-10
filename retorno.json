@@ -1,0 +1,54 @@
+[
+    {
+        "INDACAO": "A",
+        "IDINT": 4564.0,
+        "DATREGISTRO": "2024-06-05",
+        "PROPOSTA": "339297-1",
+        "IDPROPOSTA": "331165",
+        "SEQINSTALL": "1",
+        "CLIENTE": "MARCELO DE RESENDE CASTANHO",
+        "NUMTELEFONE": "(41) 99992-8062",
+        "ENDERECO": "RUA DOUTOR EDMIR SILVEIRA D\u0027ÁVILA, 333",
+        "BAIRRO": "SEMINÁRIO",
+        "CEP": "80310510",
+        "CIDADE": "CURITIBA",
+        "UF": "PR",
+        "INSTALADOR": "47300586000173",
+        "DATATRIBUIDO": "2024-06-05",
+        "DATAGENDA": "2024-06-05",
+        "SERVICOS": [
+            {
+                "SEQ": "1988885@3",
+                "DESCRICAO": "PORTA LISA 70X210 SOLIDO BRANCO - despensa"
+            }
+        ]
+    }
+]
+
+
+[
+    {
+        "INDACAO": "A",
+        "IDINT": 4564,
+        "PROPOSTA": "9997-1",
+        "IDPROPOSTA": "999999",
+        "SEQINSTALL": "1",
+        "CLIENTE": "Marcio Manoel da Silva",
+        "NUMTELEFONE": "(47) 98811-2917",
+        "ENDERECO": "Estrada Bananal, 1439 - Casa 81",
+        "BAIRRO": "Beira Rio",
+        "CEP": "89270-000",
+        "CIDADE": "Guaramirim",
+        "UF": "SC",
+        "INSTALADOR": "02925364969",
+        "DATATRIBUIDO": "2022-12-07",
+        "DATAGENDA": "2022-12-07",
+        "SERVICOS": [
+            {
+                "SEQ": "1988885@3",
+                "DESCRICAO": "Porta Sacada",
+                "INDITEM": "P"
+            }
+        ]
+    }
+]

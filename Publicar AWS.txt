@@ -1,0 +1,13 @@
+aws ecr get-login-password --region sa-east-1 | docker login --username AWS --password-stdin 986565844821.dkr.ecr.sa-east-1.amazonaws.com/nodeTest
+
+
+docker build -t anakinox/api-rest:P1.0.1 .
+docker tag api-rest:P1.0.1 anakinrox/api-rest:P1.0.1
+docker push 986565844821.dkr.ecr.sa-east-1.amazonaws.com/nodeTest:P1.0.1
+
+
+
+docker build -t anakinrox/apiv2:T1.0.1 .
+docker tag anakinrox/apiv2:T1.0.1 986565844821.dkr.ecr.sa-east-1.amazonaws.com/node-app:T1.1.1
+docker push 986565844821.dkr.ecr.sa-east-1.amazonaws.com/node-app:T1.1.1
+
