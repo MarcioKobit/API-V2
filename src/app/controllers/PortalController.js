@@ -170,8 +170,6 @@ class PortalController {
         }
 
 
-
-
         const corpo = req.body;
         var wArray = {
             STATUS: false,

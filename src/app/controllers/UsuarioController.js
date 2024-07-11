@@ -67,20 +67,28 @@ class UsuarioController {
         var wArray = {};
         var wOjSenha = jwtController.encrypt(corpo.SENHA);
         if (!wOjSenha[0]) { return false; };
-
-        // console.log('Login Executado')
-
-        const row = (corpo.AREA != undefined && corpo.AREA != '' && corpo.AREA == 'APP') ? await UsuarioRepository.login(corpo.LOGIN, wOjSenha[1], corpo.SENHA) : await UsuarioRepository.login(corpo.LOGIN, wOjSenha[1], corpo.SENHA)
+        const row = (corpo.AREA == undefined || corpo.AREA == '' || corpo.AREA == 'APP') ? await UsuarioRepository.login(corpo.LOGIN, wOjSenha[1], corpo.SENHA) : await UsuarioRepository.loginPortal(corpo.LOGIN, wOjSenha[1], corpo.SENHA)
 
         var length = Object.keys(row).length;
         if (length > 0) {
-            // console.log(row)
+            var dadosUsuario = {};
             for (var i = 0; i < length; i++) {
-                const dadosUsuario = {
-                    id: row[i].codUsuario,
-                    codempresa: row[i].codEmpresa,
-                    nome: row[i].nomUsuario
-                };
+
+                if (corpo.AREA != undefined && corpo.AREA != '' && corpo.AREA == 'APP') {
+                    dadosUsuario = {
+                        id: row[i].codUsuario,
+                        codempresa: row[i].codEmpresa,
+                        nome: row[i].nomUsuario
+                    };
+                } else {
+                    dadosUsuario = {
+                        id: row[i].idArquiteto,
+                        idPessoa: row[i].idPessoa,
+                        nome: row[i].nome,
+                        nr_cupom: row[i].nr_cupom
+                    };
+                }
+
 
                 // ####### Criaçao do JWT #######
                 var wOjJWT = jwtController.criar(dadosUsuario, res);
@@ -98,8 +106,10 @@ class UsuarioController {
                 // console.log(row[i]);
                 var data = {
                     ID: row[i].codUsuario,
+                    IDPESSOA: row[i].idPessoa,
                     CODEMPRESA: row[i].codEmpresa,
                     NOME: row[i].nomUsuario,
+                    CUPOM: row[i].nr_cupom,
                     TOKEN: token,
                     ROTA: wRota
                 };
