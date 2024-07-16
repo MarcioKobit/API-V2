@@ -24,13 +24,14 @@ class PortalController {
             DATA: []
         };
 
+        // console.log(id)
         const objPremios = await PortalRepository.findPontosByID(id);
         var wArrayData = [];
         for (var i = 0; i < objPremios.length; i++) {
 
             var data = {
-                codusuario: objPremios[i].codusuario,
-                pontos: objPremios[i].numpontos
+                codusuario: objPremios[i].codusuario != null ? objPremios[i].codusuario : 0,
+                pontos: objPremios[i].numpontos != null ? objPremios[i].numpontos : 0
             }
 
         }
@@ -164,11 +165,9 @@ class PortalController {
                     MENSAGEM: 'Token Inválido'
                 }]
             };
-
             res.json(wArray);
             return false;
         }
-
 
         const corpo = req.body;
         var wArray = {
@@ -176,8 +175,8 @@ class PortalController {
             RECORDS: 0,
             DATA: []
         };
-
-        return false;
+        // res.json(wArray);
+        // return false;
         var wArrayData = []
         for (var i = 0; i < corpo.RECORDS; i++) {
             var wOjSenha = jwtController.encrypt(corpo.DATA[i].SENHA);
@@ -199,27 +198,79 @@ class PortalController {
                 });
 
             } catch (error) {
-
-
                 // console.log(error)
-                // await InstalacoesRepository.updateInstalacaoAgenda(corpo[i]).then((resposta) => {
-                //     InstalacoesRepository.removeServico(corpo[i]);
-                //     for (var x = 0; x < corpo[i].SERVICOS.length; x++) {
-                //         try {
-                //             InstalacoesRepository.createinstalacoesServico(corpo[i], corpo[i].SERVICOS[x])
-                //         } catch (error) {
-                //             continue;
-                //         }
-                //     }
+                var wIndSituacao = corpo.DATA[i].SITARQ == false || corpo.DATA[i].SITPESSOA == false ? false : true;
+                await PortalRepository.updateArquiteto(corpo.DATA[i], wIndSituacao).then((resposta) => {
 
-                //     var data = {
-                //         IDINT: corpo[i].IDINT,
-                //         IDPROPOSTA: corpo[i].IDPROPOSTA,
-                //         SEQINSTALL: corpo[i].SEQINSTALL,
-                //         ACAO: 'UPD'
-                //     }
-                //     wArrayData.push(data)
-                // });
+
+                    var data = {
+                        IDINT: null,
+                        IDPESSOA: corpo.DATA[i].IDPESSOA,
+                        ACAO: 'UPD'
+                    }
+
+                    wArrayData.push(data);
+
+                });
+
+            }
+        }
+
+        wArray = {
+            STATUS: true,
+            RECORDS: wArrayData.length,
+            DATA: wArrayData
+        };
+
+
+        res.json(wArray);
+    }
+
+    async storeExtratos(req, res) {
+
+        const jwt = req.headers["authorization"] || req.headers["x-access-token"];
+        const objAPI = await UsuarioRepository.validaToken(jwt);
+
+        if (objAPI.length == 0) {
+            var wArray = {
+                STATUS: false,
+                RECORDS: 1,
+                DATA: [{
+                    MENSAGEM: 'Token Inválido'
+                }]
+            };
+
+            res.json(wArray);
+            return false;
+        }
+
+
+        const corpo = req.body;
+        var wArray = {
+            STATUS: false,
+            RECORDS: 0,
+            DATA: []
+        };
+
+        // return false;
+        var wArrayData = []
+        for (var i = 0; i < corpo.RECORDS; i++) {
+            try {
+                await PortalRepository.createExtrato(corpo.DATA[i]).then((resposta) => {
+                    if (resposta.insertId > 0) {
+
+                        var data = {
+                            IDINT: resposta.insertId,
+                            IDPROPOSTA: corpo.DATA[i].IDPROPOSTA,
+                            ACAO: 'INS'
+                        }
+
+                        wArrayData.push(data);
+                    }
+                });
+
+            } catch (error) {
+                // console.log(error)
             }
         }
 

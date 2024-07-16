@@ -8,6 +8,16 @@ class PortalRepository {
         return consulta(sql, [reg.IDPESSOA, reg.NOMUSUARIO, reg.CPFCNPJ, reg.EMAIL, reg.SENHA, reg.CUPOM], 'Não foi possível cadastrar!')
     }
 
+    updateArquiteto(reg, pSituacao) {
+        var sql = "update arquitetos set nome = ?, cpfcnpj = ?, email = ?, nr_cupom = ?, indSituacao = ? where idPessoa = ?";
+        return consulta(sql, [reg.NOMUSUARIO, reg.CPFCNPJ, reg.EMAIL, reg.CUPOM, pSituacao, reg.IDPESSOA], 'Não foi possível cadastrar!')
+    }
+
+    createExtrato(reg) {
+        var sql = "insert into extrato (idproposta, codusuario, numproposta, nomcliente, valor, pontos, loja, datacompra) values (?, (SELECT idArquiteto from arquitetos where idPessoa = ?), ?, ?, ?, ?, ?, ?)";
+        return consulta(sql, [reg.IDPROPOSTA, reg.IDPESSOA, reg.PROPOSTA, reg.CLIENTE, reg.VALOR, parseInt(reg.VALOR), reg.EQUIPE, reg.EMISSAO], 'Não Incluir o extrato!')
+    }
+
     createinstalacoesServico(reg, regitem) {
         var sql = "insert into instalacaoServico (idinstalacao, idseq, descricao, indsituacao) values ((select idinstalacao from instalacoes where orderid = ? and seqInstall = ?), ?, ?, 'P') ";
         return consulta(sql, [reg.IDPROPOSTA, reg.SEQINSTALL, regitem.SEQ, regitem.DESCRICAO], 'Não foi possível cadastrar!')
@@ -63,7 +73,7 @@ class PortalRepository {
 
     findPontosByID(idusuario) {
 
-        var sql = "select codusuario, numpontos from pontos where codusuario = ?";
+        var sql = "select codusuario, sum(pontos) as numpontos from extrato where codusuario = ?";
         return consulta(sql, [idusuario], 'Não foi possível localizar!')
     }
 

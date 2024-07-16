@@ -82,9 +82,9 @@ class UsuarioController {
                     };
                 } else {
                     dadosUsuario = {
-                        id: row[i].idArquiteto,
+                        id: row[i].codUsuario,
                         idPessoa: row[i].idPessoa,
-                        nome: row[i].nome,
+                        nome: row[i].nomUsuario,
                         nr_cupom: row[i].nr_cupom
                     };
                 }
