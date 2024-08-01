@@ -34,8 +34,9 @@ class JWTController {
         try {
             return [true, crypto.createHash('md5').update(senha).digest("hex")];
         } catch (error) {
-            res.status(403);
-            res.end();
+            // console.log(error)
+            // res.status(403);
+            // res.end();
             return [false, null];
         }
     }

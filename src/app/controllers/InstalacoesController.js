@@ -115,9 +115,9 @@ class InstalacoesController {
 
         // console.log(req.query.proposta);
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
-        if (!wOjJWT[0]) { return false; };
-        const { codempresa, id } = wOjJWT[1]
+        // var wOjJWT = jwtController.validar(req, res);
+        // if (!wOjJWT[0]) { return false; };
+        // const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######
 
         const { idproposta, seqinstall, fotos, servico } = req.query;
@@ -146,23 +146,39 @@ class InstalacoesController {
             for (var i = 0; i < objInstalacao.length; i++) {
                 var wArrayDataServ = [];
                 if (servico == undefined || servico == '') {
-                    const objServ = await InstalacoesRepository.findServicoByID(objInstalacao[i].idInstalacao);
-                    for (var x = 0; x < objServ.length; x++) {
-                        if (fotos == undefined || fotos == 'S') {
-
-                        }
-
-                        var data = {
-                            ID: objServ[x].id,
-                            IDINSTALACAO: objServ[x].idInstalacao,
-                            IDSEQ: objServ[x].idseq,
-                            DESCRICAO: objServ[x].descricao,
-                            SITUACAO: objServ[x].indsituacao,
-                            FOTOS: []
-                        }
-                        wArrayDataServ.push(data);
-                    };
+                    var objServ = await InstalacoesRepository.findServicoByID(objInstalacao[i].idInstalacao);
+                } else {
+                    var objServ = await InstalacoesRepository.findServicoByIDServ(objInstalacao[i].idInstalacao, servico);
                 }
+
+                for (var x = 0; x < objServ.length; x++) {
+                    var wArrayDataServFoto = [];
+                    if (fotos == undefined || fotos == 'S') {
+                        var objServFoto = await InstalacoesRepository.findServicoFotoById(objInstalacao[i].idInstalacao, objServ[x].id);
+                        if (objServFoto.length == 0) {
+                            var objServFoto = await InstalacoesRepository.findServicoFotoByIdOld(objInstalacao[i].idInstalacao, objServ[x].id);
+                        }
+                        for (var y = 0; y < objServFoto.length; y++) {
+                            var data = {
+                                ID: objServFoto[y].id,
+                                ARQUIVO: objServFoto[y].nomArquivo,
+                                FOTO: objServFoto[y].foto
+                            }
+                            wArrayDataServFoto.push(data);
+                        }
+                    }
+
+                    var data = {
+                        ID: objServ[x].id,
+                        IDINSTALACAO: objServ[x].idInstalacao,
+                        IDSEQ: objServ[x].idseq,
+                        DESCRICAO: objServ[x].descricao,
+                        SITUACAO: objServ[x].indsituacao,
+                        FOTOS: wArrayDataServFoto
+                    }
+                    wArrayDataServ.push(data);
+                };
+
 
                 var data = {
                     ID: objInstalacao[i].idInstalacao,

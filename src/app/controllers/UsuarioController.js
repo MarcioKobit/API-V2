@@ -138,47 +138,73 @@ class UsuarioController {
 
 
     async store(req, res) {
-        // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
-        if (!wOjJWT[0]) { return false; };
-        const { codempresa, id } = wOjJWT[1]
-        // ####### Validacao do JWT #######
 
-        const corpo = req.body;
-        var wArray = [];
+        const jwt = req.headers["authorization"] || req.headers["x-access-token"];
+        const objAPI = await UsuarioRepository.validaToken(jwt);
 
-        var length = Object.keys(corpo).length;
-        var wArrayData = []
-        for (var i = 0; i < length; i++) {
+        if (objAPI.length == 0) {
+            var wArray = {
+                STATUS: false,
+                RECORDS: 1,
+                DATA: [{
+                    MENSAGEM: 'Token Inválido'
+                }]
+            };
+            res.json(wArray);
+            return false;
+        }
 
-            var wOjSenha = jwtController.encrypt(corpo[i].senha);
-            if (!wOjSenha[0]) { continue; };
-            corpo[i].senha = wOjSenha[1]
+        const objUser = req.body;
+        var wArray = {};
+
+        var wArrayData = [];
+        if (objUser.RECORDS > 0) {
+            await UsuarioRepository.deactivateUser(objUser.TIP)
+        }
+
+        for (var i = 0; i < objUser.RECORDS; i++) {
+            if (objUser.DATA[i].CRYPT == 'S') {
+                var wOjSenha = jwtController.encrypt(objUser.DATA[i].SENHA);
+                if (!wOjSenha[0]) { continue; };
+                objUser.DATA[i].SENHA = wOjSenha[1]
+            }
 
             try {
                 var registro = null
-                await UsuarioRepository.create(codempresa, corpo[i]).then((resposta) => {
+                await UsuarioRepository.create('1', objUser.DATA[i]).then((resposta) => {
+
+                    UsuarioRepository.acessoUser(objUser.DATA[i]);
                     var data = {
-                        nome: corpo[i].nome,
-                        cpf: corpo[i].cpf
+                        acao: 'INS',
+                        nome: objUser.DATA[i].NOMUSUARIO,
+                        cpf: objUser.DATA[i].NUMCPF
                     }
                     wArrayData.push(data)
                 });
 
             } catch (error) {
+                try {
+                    await UsuarioRepository.updateUser(objUser.DATA[i]).then((resposta) => {
+                        var data = {
+                            acao: 'UPD',
+                            nome: objUser.DATA[i].NOMUSUARIO,
+                            cpf: objUser.DATA[i].NUMCPF
+                        }
+                        wArrayData.push(data)
+                    });
+                } catch (errorUPD) {
+                }
             }
-
         }
-        wArray.push({
+
+        wArray = {
             STATUS: true,
             RECORDS: wArrayData.length,
             DATA: wArrayData
-        });
-
+        };
 
         res.json(wArray);
     }
-
 }
 
 // padrão Singleton

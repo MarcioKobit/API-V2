@@ -340,16 +340,16 @@ class MovelController {
     }
 
     async showPipe(req, res) {
-        // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
-        if (!wOjJWT[0]) { return false; };
-        const { codempresa, id } = wOjJWT[1]
-        // ####### Validacao do JWT #######
+        // // ####### Validacao do JWT #######
+        // var wOjJWT = jwtController.validar(req, res);
+        // if (!wOjJWT[0]) { return false; };
+        // const { codempresa, id } = wOjJWT[1]
+        // // ####### Validacao do JWT #######
 
         var wdatInicio = req.query.datainicio;
         var wdataFim = req.query.datafim;
 
-        var wArray = [];
+        var wArray = {};
         var wArrayData = [];
         const rowMovel = await MovelRepository.findPipeMovel(wdatInicio, wdataFim)
         var lengthMovel = Object.keys(rowMovel).length;
@@ -370,6 +370,8 @@ class MovelController {
                     CODVISITA: rowMovel[i].codVisita,
                     TIPOLOCAL: rowMovel[i].tiplocal,
                     LOCAL: rowMovel[i].local,
+                    CODTIPOVISITA: rowMovel[i].codTipoVisita,
+                    TIPOVISITA: rowMovel[i].tipovisita,
                     EMPRESA: rowMovel[i].empresa,
                     CONTATO: rowMovel[i].contato,
                     DATA: rowMovel[i].data,
@@ -429,11 +431,11 @@ class MovelController {
             }
         }
 
-        wArray.push({
+        wArray = {
             STATUS: ((lengthMovel + lengtEventos) > 0 ? true : false),
             RECORDS: (lengthMovel + lengtEventos),
             DATA: wArrayData
-        });
+        };
 
         res.json(wArray)
     }

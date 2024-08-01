@@ -101,6 +101,10 @@ class InstalacoesRepository {
         var sql = "select id, idInstalacao, idseq, descricao, indsituacao from instalacaoServico where idInstalacao = ?";
         return consulta(sql, [idInstalacao], 'Não foi possível localizar!')
     }
+    findServicoByIDServ(idInstalacao, idServico) {
+        var sql = "select id, idInstalacao, idseq, descricao, indsituacao from instalacaoServico where idInstalacao = ? and idSeq = ?";
+        return consulta(sql, [idInstalacao, idServico], 'Não foi possível localizar!')
+    }
 
     findServicoByUser(pCodUsuario) {
         var sql = "";
@@ -121,7 +125,12 @@ class InstalacoesRepository {
     }
 
     findServicoFotoById(pCodInstalacao, pCodServico) {
-        var sql = "select id, nomArquivo, foto from instalacaoServicoFoto where idInstalacao = ? and idServico = ?";
+        var sql = "select id, nomArquivo, convert(foto using utf8) as foto from instalacaoServicoFoto where idInstalacao = ? and idServico = ?";
+        return consulta(sql, [pCodInstalacao, pCodServico], 'Não foi possível localizar!');
+    }
+
+    findServicoFotoByIdOld(pCodInstalacao, pCodServico) {
+        var sql = "select id, nomArquivo, foto as foto from instalacaoServicoFoto_old where idInstalacao = ? and idServico = ?";
         return consulta(sql, [pCodInstalacao, pCodServico], 'Não foi possível localizar!');
     }
 

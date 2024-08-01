@@ -140,139 +140,200 @@ class MovelRepository {
     }
 
     findPipeMovel(pDataIni, pDataFim) {
-        var sql = "select ";
-        sql += "   p.id,  ";
-        sql += "   p.indSync,  ";
-        sql += "   r.numPlaca,  ";
-        sql += "   v.id as codVisita,  ";
-        sql += "   v.tiplocal,  ";
-        sql += "   v.local,  ";
-        sql += "   v.documentoID,  ";
-        sql += "   p.idFluig,  ";
-        sql += "   p.contato,  ";
-        sql += "   case ";
-        sql += "       when p.id is not null then ";
-        sql += "           DATE_FORMAT( p.data, '%d/%m/%Y' ) ";
-        sql += "       else ";
-        sql += "           DATE_FORMAT( v.data, '%d/%m/%Y' ) ";
-        sql += "   end as data, ";
-        sql += "   p.hora,  ";
-        sql += "   p.empresa,  ";
-        sql += "   p.telefone,  ";
-        sql += "   case ";
-        sql += "       when p.uf is not null then ";
-        sql += "           p.uf ";
-        sql += "       else ";
-        sql += "           rc.uf ";
-        sql += "   end as uf, ";
-        sql += "   case ";
-        sql += "       when p.cidade is not null then ";
-        sql += "           p.cidade ";
-        sql += "       else ";
-        sql += "           rc.cidade ";
-        sql += "   end as cidade,   ";
-        sql += "   case ";
-        sql += "       when c.idCidade is not null then ";
-        sql += "           c.idCidade ";
-        sql += "       else ";
-        sql += "           cy.idCidade ";
-        sql += "   end as idCidade,     ";
-        sql += "   case ";
-        sql += "       when c.codUf is not null then ";
-        sql += "           c.codUf ";
-        sql += "       else ";
-        sql += "           cy.codUf ";
-        sql += "   end as codUf,     ";
-        sql += "   case ";
-        sql += "       when c.codPais is not null then ";
-        sql += "           c.codPais ";
-        sql += "       else ";
-        sql += "           cy.codPais ";
-        sql += "   end as codPais,      ";
-        sql += "   p.idProfissao,  ";
-        sql += "   case  ";
-        sql += "      when p.idProfissao is null then  ";
-        sql += "          p.profissao  ";
-        sql += "      else  ";
-        sql += "          pr.profissao  ";
-        sql += "   end as profissao,  ";
-        sql += "   pr.idFunil,  ";
-        sql += "   pr.funil, ";
-        sql += "   case    ";
-        sql += "      when p.idGestor <> 0 then   ";
-        sql += "          p.idGestor   ";
-        sql += "      else  ";
-        sql += "          vend.id  ";
-        sql += "   end as idGestor,       ";
-        sql += "   case    ";
-        sql += "      when pr.idDestinatario is not null then   ";
-        sql += "          pr.idDestinatario   ";
-        sql += "      else   ";
-        sql += "          case    ";
-        sql += "          when p.idGestor <> 0 then   ";
-        sql += "              g.idFunil    ";
-        sql += "          else  ";
-        sql += "              vend.idFunil  ";
-        sql += "          end  ";
-        sql += "   end as idPipe,   ";
-        sql += "   case    ";
-        sql += "      when p.idGestor <> 0 then   ";
-        sql += "          g.nomGestor   ";
-        sql += "      else  ";
-        sql += "          vend.nomVendedor  ";
-        sql += "   end as nomGestor,   ";
-        sql += "   p.motivoRecusa,  ";
-        sql += "   p.observacao,  ";
-        sql += "   case ";
-        sql += "       when u.nomUsuario is not null then ";
-        sql += "           p.latitude ";
-        sql += "       else ";
-        sql += "           v.latitude ";
-        sql += "   end as latitude,     ";
-        sql += "    case ";
-        sql += "       when u.nomUsuario is not null then ";
-        sql += "           p.longitude ";
-        sql += "       else ";
-        sql += "           v.longitude ";
-        sql += "   end as longitude,  ";
-        sql += "   p.indSituacao, ";
-        sql += "   uv.login as cpfmotorista, ";
-        sql += "   uv.nomUsuario as motorista, ";
-        sql += "   case ";
-        sql += "       when u.login <> uv.login then ";
-        sql += "           u.login ";
-        sql += "       else ";
-        sql += "           null ";
-        sql += "   end as cpfajudante, ";
-        sql += "   case ";
-        sql += "       when uv.nomUsuario <> u.nomUsuario then ";
-        sql += "           u.nomUsuario ";
-        sql += "       else ";
-        sql += "           null ";
-        sql += "   end as ajudante, ";
-        sql += "   case ";
-        sql += "       when u.nomUsuario is not null then ";
-        sql += "           u.nomUsuario ";
-        sql += "       else ";
-        sql += "           uv.nomUsuario ";
-        sql += "   end as indcaptura ";
-        sql += "from visitas v  ";
-        sql += "    inner join rotas_cidades rc on (rc.id = v.codCidade) ";
-        sql += "    inner join rotas r on (r.id = rc.codRota) ";
-        sql += "    left join parceiros p on (v.id = p.codVisita) ";
-        sql += "    left join usuarios u on (u.codUsuario = p.codusuario) ";
-        sql += "    left join usuarios uv on (uv.codUsuario = r.codusuario) ";
-        sql += "    left join cidades c on (c.cidade = p.cidade) ";
-        sql += "                        and (c.uf = p.uf) ";
-        sql += "    left join cidades cy on (cy.cidade = rc.cidade) ";
-        sql += "                        and (cy.uf = rc.uf) ";
-        sql += "    left join profissoes pr on (pr.id = p.idProfissao) ";
-        sql += "    left join gestorFunil g on (g.codProfissao = p.idProfissao) ";
-        sql += "                           and (g.id = p.idGestor) ";
-        sql += "    left join vendedores vend on (vend.codProfissao = p.idProfissao) ";
-        sql += "                             and (vend.id = p.idVendedor) ";
-        sql += "where v.data between ? and ? ";
-        return consulta(sql, [pDataIni, pDataFim], 'Não foi possível localizar!')
+        var sql = "select  " +
+            "   p.id,   " +
+            "   p.indSync,   " +
+            "   r.numPlaca,   " +
+            "   v.id as codVisita,   " +
+            "   v.tiplocal,   " +
+            "   v.local,   " +
+            "   tpv.codTipo as codTipoVisita,   " +
+            "   tpv.descricao as tipoVisita,   " +
+            "   cnd.nomCondominio,   " +
+            "   v.documentoID,   " +
+            "   p.idFluig,   " +
+            "   p.contato,   " +
+            "   case  " +
+            "       when p.id is not null then  " +
+            "           DATE_FORMAT( p.data, '%d/%m/%Y' )  " +
+            "       else  " +
+            "           DATE_FORMAT( v.data, '%d/%m/%Y' )  " +
+            "   end as data,  " +
+            "   p.hora,   " +
+            "   p.empresa,   " +
+            "   p.telefone,   " +
+            "   case  " +
+            "       when p.uf is not null then  " +
+            "           p.uf  " +
+            "       else  " +
+            "           rc.uf  " +
+            "   end as uf,  " +
+            "   case  " +
+            "       when p.cidade is not null then  " +
+            "           p.cidade  " +
+            "       else  " +
+            "           rc.cidade  " +
+            "   end as cidade,    " +
+            "   case  " +
+            "       when c.idCidade is not null then  " +
+            "           c.idCidade  " +
+            "       else  " +
+            "           cy.idCidade  " +
+            "   end as idCidade,      " +
+            "   case  " +
+            "       when c.codUf is not null then  " +
+            "           c.codUf  " +
+            "       else  " +
+            "           cy.codUf  " +
+            "   end as codUf,      " +
+            "   case  " +
+            "       when c.codPais is not null then  " +
+            "           c.codPais  " +
+            "       else  " +
+            "           cy.codPais  " +
+            "   end as codPais,       " +
+            "   p.idProfissao,   " +
+            "   case   " +
+            "      when p.idProfissao is null then   " +
+            "          p.profissao   " +
+            "      else   " +
+            "          pr.profissao   " +
+            "   end as profissao,   " +
+            "   pr.idFunil,   " +
+            "   pr.funil,  " +
+            "   case     " +
+            "      when p.idGestor <> 0 then    " +
+            "          p.idGestor    " +
+            "      else   " +
+            "          vend.id   " +
+            "   end as idGestor,        " +
+            "   case     " +
+            "      when pr.idDestinatario is not null then    " +
+            "          pr.idDestinatario    " +
+            "      else    " +
+            "          case     " +
+            "          when p.idGestor <> 0 then    " +
+            "              g.idFunil     " +
+            "          else   " +
+            "              vend.idFunil   " +
+            "          end   " +
+            "   end as idPipe,    " +
+            "   case     " +
+            "      when p.idGestor <> 0 then    " +
+            "          g.nomGestor    " +
+            "      else   " +
+            "          vend.nomVendedor   " +
+            "   end as nomGestor,    " +
+            "   p.motivoRecusa,   " +
+            "   p.observacao,   " +
+            "   case  " +
+            "       when u.nomUsuario is not null then  " +
+            "           p.latitude  " +
+            "       else  " +
+            "           v.latitude  " +
+            "   end as latitude,      " +
+            "    case  " +
+            "       when u.nomUsuario is not null then  " +
+            "           p.longitude  " +
+            "       else  " +
+            "           v.longitude  " +
+            "   end as longitude,   " +
+            "   p.indSituacao,  " +
+            "   uv.login as cpfmotorista,  " +
+            "   uv.nomUsuario as motorista,  " +
+            "   case  " +
+            "       when u.login <> uv.login then  " +
+            "           u.login  " +
+            "       else  " +
+            "           null  " +
+            "   end as cpfajudante,  " +
+            "   case  " +
+            "       when uv.nomUsuario <> u.nomUsuario then  " +
+            "           u.nomUsuario  " +
+            "       else  " +
+            "           null  " +
+            "   end as ajudante,  " +
+            "   case  " +
+            "       when u.nomUsuario is not null then  " +
+            "           u.nomUsuario  " +
+            "       else  " +
+            "           uv.nomUsuario  " +
+            "   end as indcaptura,  " +
+            "   tpv.codTipo as codTipoVisita, " +
+            "   tpv.descricao as tipovisita " +
+            "from visitas v   " +
+            "    inner join rotas_cidades rc on (rc.id = v.codCidade)  " +
+            "    inner join rotas r on (r.id = rc.codRota)  " +
+            "    left join condominio cnd on (cnd.id = v.codCondominio)  " +
+            "    left join tipovisita tpv on (tpv.codTipo = v.codTipoVisita)  " +
+            "    inner join parceiros p on (v.id = p.codVisita)  " +
+            "    left join usuarios u on (u.codUsuario = p.codusuario)  " +
+            "    left join usuarios uv on (uv.codUsuario = r.codusuario)  " +
+            "    left join cidades c on (c.cidade = p.cidade)  " +
+            "                        and (c.uf = p.uf)  " +
+            "    left join cidades cy on (cy.cidade = rc.cidade)  " +
+            "                        and (cy.uf = rc.uf)  " +
+            "    left join profissoes pr on (pr.id = p.idProfissao)  " +
+            "    left join gestorFunil g on (g.codProfissao = p.idProfissao)  " +
+            "                           and (g.id = p.idGestor)  " +
+            "    left join vendedores vend on (vend.codProfissao = p.idProfissao)  " +
+            "                             and (vend.id = p.idVendedor)  " +
+            "where v.data between ? and ? " +
+            "  union " +
+            "select  " +
+            "   null as id,   " +
+            "   null as indSync,   " +
+            "   r.numPlaca,   " +
+            "   v.id as codVisita,   " +
+            "   v.tiplocal,   " +
+            "   v.local,   " +
+            "   tpv.codTipo as codTipoVisita,   " +
+            "   tpv.descricao as tipoVisita,   " +
+            "   cnd.nomCondominio,   " +
+            "   v.documentoID,   " +
+            "   null as idFluig,   " +
+            "   null as contato,   " +
+            "   DATE_FORMAT( v.data, '%d/%m/%Y' ) as data,  " +
+            "   null as hora,   " +
+            "   null as empresa,   " +
+            "   null as telefone,   " +
+            "   rc.uf as uf,  " +
+            "   rc.cidade as cidade,    " +
+            "   cy.idCidade as idCidade,      " +
+            "   cy.codUf as codUf,      " +
+            "   cy.codPais as codPais,       " +
+            "   null as idProfissao,   " +
+            "   null as profissao,   " +
+            "   null as idFunil,   " +
+            "   null as funil,  " +
+            "   null as  idGestor,        " +
+            "   null as idPipe,    " +
+            "   null as nomGestor,    " +
+            "   null as motivoRecusa,   " +
+            "   null as observacao,   " +
+            "   v.latitude as latitude,      " +
+            "   v.longitude as longitude,   " +
+            "   null as indSituacao,  " +
+            "   uv.login as cpfmotorista,  " +
+            "   uv.nomUsuario as motorista,  " +
+            "   null as cpfajudante,  " +
+            "   null as ajudante,  " +
+            "   uv.nomUsuario as indcaptura,  " +
+            "   tpv.codTipo as codTipoVisita, " +
+            "   tpv.descricao as tipovisita " +
+            "from visitas v   " +
+            "    inner join rotas_cidades rc on (rc.id = v.codCidade)  " +
+            "    inner join rotas r on (r.id = rc.codRota)  " +
+            "    left join condominio cnd on (cnd.id = v.codCondominio)  " +
+            "    left join tipovisita tpv on (tpv.codTipo = v.codTipoVisita)  " +
+            "    left join usuarios uv on (uv.codUsuario = r.codusuario)  " +
+            "    left join cidades cy on (cy.cidade = rc.cidade)  " +
+            "                        and (cy.uf = rc.uf)  " +
+            "where v.data between ? and ? ";
+
+        // 
+        return consulta(sql, [pDataIni, pDataFim, pDataIni, pDataFim], 'Não foi possível localizar!')
+
     }
 
     findPipeEventos(pDataIni, pDataFim) {
