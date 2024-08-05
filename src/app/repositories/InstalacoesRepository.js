@@ -24,10 +24,33 @@ class InstalacoesRepository {
         return consulta(sql, [reg.IDINSTALACAO, reg.IDSERVICO, reg.ID], 'Não foi possível cadastrar!')
     }
 
-    removeServico(reg) {
+    removeServicoPendente(reg) {
         var sql = "delete from instalacaoServico where idInstalacao = (select idinstalacao from instalacoes where orderid = ? and seqInstall = ?) and indSituacao = 'P'";
         return consulta(sql, [reg.IDPROPOSTA, reg.SEQINSTALL], 'Não foi possível cadastrar!')
     }
+
+    removeServicoFotoPendente(reg) {
+        var sql = "delete from instalacaoServicoFoto where idInstalacao = (select idinstalacao from instalacoes where orderid = ? and seqInstall = ?) and idServico in (select id from instalacaoServico where idInstalacao = (select idinstalacao from instalacoes where orderid = ? and seqInstall = ?) and indSituacao = 'P')";
+        return consulta(sql, [reg.IDPROPOSTA, reg.SEQINSTALL, reg.IDPROPOSTA, reg.SEQINSTALL], 'Não foi possível cadastrar!')
+    }
+
+
+    removeServicoGeral(reg) {
+        var sql = "delete from instalacaoServico where idInstalacao = (select idinstalacao from instalacoes where orderid = ? and seqInstall = ?)";
+        return consulta(sql, [reg.IDPROPOSTA, reg.SEQINSTALL], 'Não foi possível cadastrar!')
+    }
+
+    removeServicoFotoGeral(reg) {
+        var sql = "delete from instalacaoServicoFoto where idInstalacao = (select idinstalacao from instalacoes where orderid = ? and seqInstall = ?)";
+        return consulta(sql, [reg.IDPROPOSTA, reg.SEQINSTALL], 'Não foi possível cadastrar!')
+    }
+
+
+    removeInstalacaoGeral(reg) {
+        var sql = "delete from instalacoes where orderid = ? and seqInstall = ?";
+        return consulta(sql, [reg.IDPROPOSTA, reg.SEQINSTALL], 'Não foi possível cadastrar!')
+    }
+
 
     updateInstalacaoAgenda(reg) {
         var sql = "update instalacoes set datagendado = ?  where orderid = ? and seqInstall = ?";

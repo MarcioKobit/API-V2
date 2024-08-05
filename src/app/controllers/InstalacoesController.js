@@ -2,6 +2,7 @@
 import InstalacoesRepository from '../repositories/InstalacoesRepository.js';
 import jwtController from './jwtController.js';
 import auxiliares from '../components/auxiliares.js';
+import UsuarioRepository from '../repositories/UsuarioRepository.js';
 
 
 class InstalacoesController {
@@ -209,14 +210,25 @@ class InstalacoesController {
     }
 
     async storeInstalacoes(req, res) {
-        // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
-        if (!wOjJWT[0]) { return false; };
-        const { codempresa, id } = wOjJWT[1]
-        // ####### Validacao do JWT #######
+
+        const jwt = req.headers["authorization"] || req.headers["x-access-token"];
+        // console.log(jwt)
+        const objAPI = await UsuarioRepository.validaToken(jwt);
+
+        if (objAPI.length == 0) {
+            var wArray = {
+                STATUS: false,
+                RECORDS: 1,
+                DATA: [{
+                    MENSAGEM: 'Token Inválido'
+                }]
+            };
+            res.json(wArray);
+            return false;
+        }
 
         const corpo = req.body;
-        var wArray = [];
+        var wArray = {};
 
         var length = Object.keys(corpo).length;
         var wArrayData = []
@@ -250,7 +262,8 @@ class InstalacoesController {
                 } catch (error) {
 
                     await InstalacoesRepository.updateInstalacaoAgenda(corpo[i]).then((resposta) => {
-                        InstalacoesRepository.removeServico(corpo[i]);
+                        InstalacoesRepository.removeServicoPendente(corpo[i]);
+                        InstalacoesRepository.removeServicoFotoPendente(corpo[i]);
                         for (var x = 0; x < corpo[i].SERVICOS.length; x++) {
                             try {
                                 InstalacoesRepository.createinstalacoesServico(corpo[i], corpo[i].SERVICOS[x])
@@ -275,14 +288,32 @@ class InstalacoesController {
 
             }
 
+            if (corpo[i].INDACAO == 'D') {
+
+                // console.log(corpo[i])
+                await InstalacoesRepository.removeServicoFotoGeral(corpo[i]);
+                await InstalacoesRepository.removeServicoGeral(corpo[i]);
+                await InstalacoesRepository.removeInstalacaoGeral(corpo[i]);
+
+                var data = {
+                    IDINT: corpo[i].IDINT,
+                    IDPROPOSTA: corpo[i].IDPROPOSTA,
+                    SEQINSTALL: corpo[i].SEQINSTALL,
+                    ACAO: 'DEL'
+                }
+
+                wArrayData.push(data)
+
+            }
+
 
         }
 
-        wArray.push({
+        wArray = {
             STATUS: true,
             RECORDS: wArrayData.length,
             DATA: wArrayData
-        });
+        };
 
 
         res.json(wArray);
