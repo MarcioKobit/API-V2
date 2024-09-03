@@ -5,19 +5,19 @@ class EventosRepository {
     create(pcodEmpresa, reg) {
         var sql = "insert into eventos (codEmpresa, idFluig, documentID, codOrigem, nomEvento, datInicio, datFim, codCidade, nomEndereco, nomBairro, latitude, longitude, indSituacao) values ";
         sql += " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'P')";
-        return consulta(sql, [pcodEmpresa, reg.ID, reg.DOCUMENTID, reg.CODORIGEM, reg.EVENTO, reg.INICIO, reg.FIM, reg.CODCIDADE, reg.ENDERECO, reg.BAIRRO, reg.LATITUDE, reg.LONGITUDE], 'Não foi possível cadastrar!')
+        return consulta(sql, [pcodEmpresa, reg.ID, reg.DOCUMENTID, reg.CODORIGEM, reg.EVENTO, reg.INICIO, reg.FIM, reg.CODCIDADE, reg.ENDERECO, reg.BAIRRO, reg.LATITUDE, reg.LONGITUDE], 'Erro Eventos create!')
     }
 
     EventoUsuarios(pcodEmpresa, pcodEvento, reg) {
         var sql = "insert into usuarioEventos (codEvento, codUsuario, datInicio, datFim) values ";
         sql += " (?, (select codUsuario from usuarios where codEmpresa = ? and (login = ? or numCPF = ?)), ?, ?)";
-        return consulta(sql, [pcodEvento, pcodEmpresa, reg.CPF, reg.CPF, reg.INICIO, reg.FIM], 'Não foi possível cadastrar!')
+        return consulta(sql, [pcodEvento, pcodEmpresa, reg.CPF, reg.CPF, reg.INICIO, reg.FIM], 'Erro ao cadastrar usuarioEventos!')
     }
 
     EventoLeads(pcodEmpresa, pcodUsuario, reg) {
         var sql = "INSERT INTO leadEventos (codEvento,codUsuario,idMobile,datRegistro,nomLead,email,numTelefone,codCidade,nomEndereco,nomBairro,codProfissao,idGestor,indAmostra,ObsLead,indDivulgador,latitude,longitude,indSituacao,indSync) values";
         sql += "  (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        return consulta(sql, [reg.IDEVENTO, pcodUsuario, reg.ID, reg.DATAREGISTRO, reg.NOMLEAD, reg.EMAIL, reg.TELEFONE, reg.CODCIDADE, reg.ENDERECO, reg.BAIRRO, reg.CODPROFISSAO, reg.IDGESTOR, reg.INDAMOSTRA, reg.OBSLEAD, reg.INDDIVULGADOR, reg.LATITUDE, reg.LONGITUDE, reg.INDSITUACAO, 'S'], 'Não foi possível cadastrar!')
+        return consulta(sql, [reg.IDEVENTO, pcodUsuario, reg.ID, reg.DATAREGISTRO, reg.NOMLEAD, reg.EMAIL, reg.TELEFONE, reg.CODCIDADE, reg.ENDERECO, reg.BAIRRO, reg.CODPROFISSAO, reg.IDGESTOR, reg.INDAMOSTRA, reg.OBSLEAD, reg.INDDIVULGADOR, reg.LATITUDE, reg.LONGITUDE, reg.INDSITUACAO, 'S'], 'Erro Eventos EventoLeads!')
     }
 
     findAll(pCodEmpresa, pCodUsuario) {
@@ -64,7 +64,7 @@ class EventosRepository {
         sql += "where e.codEmpresa = ?";
         sql += "  and (e.datInicio <= current_date() and e.datFim >= current_date()) ";
 
-        return consulta(sql, [pCodEmpresa, pCodUsuario, pCodEmpresa], 'Não foi possível localizar!')
+        return consulta(sql, [pCodEmpresa, pCodUsuario, pCodEmpresa], 'Erro Eventos findAll!')
     }
 
     findLeadAll(pCodEmpresa, pCodUsuario, pCodEvento) {
@@ -98,7 +98,7 @@ class EventosRepository {
         sql += "where l.codEvento = ?";
         sql += "  and l.codUsuario = ?";
 
-        return consulta(sql, [pCodEmpresa, pCodEvento, pCodUsuario], 'Não foi possível localizar!')
+        return consulta(sql, [pCodEmpresa, pCodEvento, pCodUsuario], 'Erro Eventos findLeadAll!')
     }
 
 }

@@ -59,7 +59,7 @@ class DespesasRepository {
     create(reg) {
         var sql = "insert into movimento (id_empresa, id_mobile, data_registro, id_categoria, id_pagamento, data_pagamento, descricao, val_registro, ind_situacao) values ";
         sql += "( ?,?,?,?,?,?,?,?,?)"
-        return consulta(sql, [reg.empresa, reg.mobile, reg.data_registro, reg.categoria, reg.pagamento, reg.data_pagamento, reg.descricao, reg.valor, reg.situacao], 'Não foi possível cadastrar!')
+        return consulta(sql, [reg.empresa, reg.mobile, reg.data_registro, reg.categoria, reg.pagamento, reg.data_pagamento, reg.descricao, reg.valor, reg.situacao], 'Erro ao cadastrar movimento!')
     }
 
 }

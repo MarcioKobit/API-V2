@@ -15,20 +15,20 @@ class InstalacoesController {
         const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######
 
-        var wArray = [];
+        var wArray = {};
         const row = await InstalacoesRepository.findAll(id)
         var length = Object.keys(row).length;
         if (length > 0) {
             var wArrayData = [];
             for (var i = 0; i < length; i++) {
-                var wArrayServ = [];
+                var wArrayServ = {};
                 const rowServ = await InstalacoesRepository.findServicoAll(id, row[i].idInstalacao)
                 var lengthServ = Object.keys(rowServ).length;
                 if (lengthServ > 0) {
                     var wArrayDataServ = [];
                     for (var x = 0; x < lengthServ; x++) {
 
-                        var wArrayServFoto = [];
+                        var wArrayServFoto = {};
                         const rowServFoto = await InstalacoesRepository.findServicoFotoAll(row[i].idInstalacao, rowServ[x].id)
                         var lengthServFoto = Object.keys(rowServFoto).length;
                         if (lengthServFoto > 0) {
@@ -41,17 +41,17 @@ class InstalacoesController {
                                 }
                                 wArrayDataServFoto.push(data);
                             }
-                            wArrayServFoto.push({
+                            wArrayServFoto = {
                                 STATUS: true,
                                 RECORDS: lengthServ,
                                 DATA: wArrayDataServFoto
-                            });
+                            };
                         } else {
-                            wArrayServFoto.push({
+                            wArrayServFoto = {
                                 STATUS: false,
                                 RECORDS: 0,
                                 DATA: []
-                            });
+                            };
                         }
 
                         var data = {
@@ -63,17 +63,17 @@ class InstalacoesController {
                         }
                         wArrayDataServ.push(data);
                     }
-                    wArrayServ.push({
+                    wArrayServ = {
                         STATUS: true,
                         RECORDS: lengthServ,
                         DATA: wArrayDataServ
-                    });
+                    };
                 } else {
-                    wArrayServ.push({
+                    wArrayServ = {
                         STATUS: false,
                         RECORDS: 0,
                         DATA: []
-                    });
+                    };
                 }
 
                 var data = {
@@ -88,24 +88,26 @@ class InstalacoesController {
                     CIDADE: row[i].nomCidade,
                     UF: row[i].uf,
                     DATAGENDADO: row[i].datAgendado,
+                    DATAGENDADOFIM: row[i].datAgendadofim,
                     LATITUDE: row[i].latitudeO,
                     LONGITUDE: row[i].longitudeO,
+                    SITUACAO: row[i].indSituacao,
                     SERVICOS: wArrayServ
                 }
                 wArrayData.push(data)
 
             }
-            wArray.push({
+            wArray = {
                 STATUS: true,
                 RECORDS: length,
                 DATA: wArrayData
-            });
+            };
         } else {
-            wArray.push({
+            wArray = {
                 STATUS: false,
                 RECORDS: 0,
                 DATA: []
-            });
+            };
         }
 
 
@@ -243,8 +245,9 @@ class InstalacoesController {
                             // var lengthServ = Object.keys(corpo[i].SERVICOS).length;
                             for (var x = 0; x < corpo[i].SERVICOS.length; x++) {
                                 try {
-                                    InstalacoesRepository.createinstalacoesServico(corpo[i], corpo[i].SERVICOS[x]);
+                                    InstalacoesRepository.createinstalacoesServico(corpo[i], corpo[i].SERVICOS[x])
                                 } catch (error) {
+                                    // console.log('Cacth createinstalacoesServico');
                                 }
                             }
                         }
@@ -260,28 +263,26 @@ class InstalacoesController {
                     });
 
                 } catch (error) {
-
-                    await InstalacoesRepository.updateInstalacaoAgenda(corpo[i]).then((resposta) => {
-                        InstalacoesRepository.removeServicoPendente(corpo[i]);
-                        InstalacoesRepository.removeServicoFotoPendente(corpo[i]);
-                        for (var x = 0; x < corpo[i].SERVICOS.length; x++) {
-                            try {
-                                InstalacoesRepository.createinstalacoesServico(corpo[i], corpo[i].SERVICOS[x])
-                            } catch (error) {
-                                continue;
-                            }
+                    // console.log('Cacth instalacao')
+                    await InstalacoesRepository.updateInstalacaoAgenda(corpo[i])
+                    await InstalacoesRepository.removeServicoPendente(corpo[i]);
+                    await InstalacoesRepository.removeServicoFotoPendente(corpo[i]);
+                    for (var x = 0; x < corpo[i].SERVICOS.length; x++) {
+                        try {
+                            await InstalacoesRepository.createinstalacoesServico(corpo[i], corpo[i].SERVICOS[x])
+                        } catch (error) {
+                            continue;
                         }
+                    }
 
-                        var data = {
-                            IDINT: corpo[i].IDINT,
-                            IDPROPOSTA: corpo[i].IDPROPOSTA,
-                            SEQINSTALL: corpo[i].SEQINSTALL,
-                            ACAO: 'UPD'
-                        }
+                    var data = {
+                        IDINT: corpo[i].IDINT,
+                        IDPROPOSTA: corpo[i].IDPROPOSTA,
+                        SEQINSTALL: corpo[i].SEQINSTALL,
+                        ACAO: 'UPD'
+                    }
 
-                        wArrayData.push(data)
-                    });
-
+                    wArrayData.push(data)
 
 
                 }

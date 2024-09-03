@@ -5,7 +5,7 @@ class UsuarioRepository {
     create(codEmpresa, reg) {
         var sql = "insert into usuarios (codEmpresa, codUsuario, codTipo, nomUsuario, numCPF, Login, email, senha, indSituacao) value ";
         sql += " (?,  (select codUsuario from ( select coalesce((max(codUsuario) + 1),1) as codUsuario from usuarios) as u), ?, ?, ?, ?, ?, ?, 'A')";
-        return consulta(sql, [codEmpresa, reg.CODTIPO, reg.NOMUSUARIO, reg.NUMCPF, reg.LOGIN, reg.EMAIL, reg.SENHA], 'Não foi possível cadastrar!')
+        return consulta(sql, [codEmpresa, reg.CODTIPO, reg.NOMUSUARIO, reg.NUMCPF, reg.LOGIN, reg.EMAIL, reg.SENHA], 'Erro Usuario create!')
     }
 
     updateUser(reg) {

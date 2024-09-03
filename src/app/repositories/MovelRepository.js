@@ -5,38 +5,38 @@ class MovelRepository {
     // CRUD
     updateRetornoVisita(reg) {
         var sql = "UPDATE visitas set indSync = null where id = ?";
-        return consulta(sql, [reg.ID], 'Não foi possível cadastrar!')
+        return consulta(sql, [reg.ID], 'Erro Movel updateRetornoVisita!')
     }
 
     updateRetornoParceiro(reg) {
         var sql = "UPDATE parceiros set indSync = null, idCard = ? where id = ?";
-        return consulta(sql, [reg[i].IDCARD, reg.ID], 'Não foi possível cadastrar!')
+        return consulta(sql, [reg[i].IDCARD, reg.ID], 'Erro Movel updateRetornoParceiro!')
     }
 
     updateRetornoEvento(reg) {
         var sql = "UPDATE leadEventos set indSync = null, idCard = ? where numLead = ?";
-        return consulta(sql, [reg[i].IDCARD, reg.ID], 'Não foi possível cadastrar!')
+        return consulta(sql, [reg[i].IDCARD, reg.ID], 'Erro Movel updateRetornoEvento!')
     }
 
     createTipoLocal(pCodEmpresa, reg) {
         var sql = "INSERT INTO tipolocal (codEmpresa, codLocal, descricao, indSituacao) values (?, ?, ?,'A')";
-        return consulta(sql, [pCodEmpresa, reg.codigo, reg.descricao], 'Não foi possível cadastrar!')
+        return consulta(sql, [pCodEmpresa, reg.codigo, reg.descricao], 'Erro Movel createTipoLocal!')
     }
 
     createTipoVisita(pCodEmpresa, reg) {
         var sql = "INSERT INTO tipovisita (codEmpresa, codTipo, descricao, indSituacao) values (?, ?, ?, 'A')";
-        return consulta(sql, [pCodEmpresa, reg.codigo, reg.descricao], 'Não foi possível cadastrar!')
+        return consulta(sql, [pCodEmpresa, reg.codigo, reg.descricao], 'Erro Movel createTipoVisita!')
     }
 
     createCidades(pCodEmpresa, reg) {
         var sql = "INSERT INTO cidades (codEmpresa, codCidade, idCidade, cidade, uf, codPais, codUF, codIBGE) values (?,?,?,?,?,?,?,?)";
-        return consulta(sql, [pCodEmpresa, reg.codigo, reg.id, reg.cidade, reg.uf, reg.codpais, reg.coduf, reg.ibge], 'Não foi possível cadastrar!')
+        return consulta(sql, [pCodEmpresa, reg.codigo, reg.id, reg.cidade, reg.uf, reg.codpais, reg.coduf, reg.ibge], 'Erro Movel createCidades!')
     }
 
     createVendedores(reg) {
         var idFunil = reg.indsis == 'CRM' ? reg.idcrm : reg.idpipedrive;
         var sql = "INSERT INTO vendedores (codProfissao, idFunil, nomVendedor, indDestino, indSituacao) values (?, ?, ?, ?, ?)";
-        return consulta(sql, [reg.codprofissao, idFunil, reg.nomvendedor, reg.indsis, 'I'], 'Não foi possível cadastrar!')
+        return consulta(sql, [reg.codprofissao, idFunil, reg.nomvendedor, reg.indsis, 'I'], 'Erro Movel createVendedores!')
     }
 
     findRotasAll(pCodEmpresa, pCodUsuario) {
@@ -59,14 +59,14 @@ class MovelRepository {
         sql += " and indSituacao not in ('C','F')"
         sql += " and (datInicio <= current_date() and datfim >= curdate()) ";
 
-        return consulta(sql, [pCodEmpresa, pCodUsuario, pCodUsuario], 'Não foi possível localizar!')
+        return consulta(sql, [pCodEmpresa, pCodUsuario, pCodUsuario], 'Erro Movel findRotasAll!')
     }
 
     findCidadesAll(pCodRota) {
         var sql = "select id, codRota, cidade, DATE_FORMAT( datInicio, '%Y-%m-%d' ) as datInicio, ";
         sql += "DATE_FORMAT(datFim, '%Y-%m-%d') as datFim, expediente from rotas_cidades where codRota = ? ";
 
-        return consulta(sql, [pCodRota], 'Não foi possível localizar!')
+        return consulta(sql, [pCodRota], 'Erro Movel findCidadesAll!')
     }
 
     findVisitasAll(pCodCidade) {
@@ -88,7 +88,7 @@ class MovelRepository {
         sql += "    inner join rotas_cidades r on (r.id = v.codCidade) ";
         sql += " where v.codCidade = ? ";
 
-        return consulta(sql, [pCodCidade], 'Não foi possível localizar!')
+        return consulta(sql, [pCodCidade], 'Erro Movel findVisitasAll!')
     }
 
     findParceirosAll(pCodVisita) {
@@ -97,22 +97,22 @@ class MovelRepository {
         sql += " interesse, areaInteresse, indSituacao, documentoID, IDFluig ";
         sql += " from parceiros where codVisita = ? ";
 
-        return consulta(sql, [pCodVisita], 'Não foi possível localizar!')
+        return consulta(sql, [pCodVisita], 'Erro Movel findParceirosAll!')
     }
 
     findTipoLocal(pCodEmpresa) {
         var sql = "select codLocal, descricao from tipolocal where codEmpresa = ?";
-        return consulta(sql, [pCodEmpresa], 'Não foi possível localizar!')
+        return consulta(sql, [pCodEmpresa], 'Erro Movel findTipoLocal!')
     }
 
     findCidades(pCodEmpresa) {
         var sql = "select codCidade, uf, cidade, COALESCE(codIBGE, 0) as codIBGE from cidades where codEmpresa = ?";
-        return consulta(sql, [pCodEmpresa], 'Não foi possível localizar!')
+        return consulta(sql, [pCodEmpresa], 'Erro Movel findCidades!')
     }
 
     findProfissoes(pCodEmpresa) {
         var sql = "select id, profissao, indGestor from profissoes where codEmpresa = ?";
-        return consulta(sql, [pCodEmpresa], 'Não foi possível localizar!')
+        return consulta(sql, [pCodEmpresa], 'Erro Movel findProfissoes!')
     }
 
     findResumo(pCodUsuario) {
@@ -126,7 +126,7 @@ class MovelRepository {
         sql += "         and(year(v.data) = year(current_date()) and month(v.data) = month(current_date()))";
         sql += "         where(year(r.datInicio) = year(current_date()) and month(r.datInicio) = month(current_date()) or year(r.datfim) = year(current_date()) and month(r.datfim) = month(current_date()))";
         sql += "         and(r.codUsuario = ? or codAjudante = ?); ";
-        return consulta(sql, [pCodUsuario, pCodUsuario], 'Não foi possível localizar!')
+        return consulta(sql, [pCodUsuario, pCodUsuario], 'Erro Movel findResumo!')
     }
 
     findVendedores() {
@@ -136,7 +136,7 @@ class MovelRepository {
         sql += "    v.nomVendedor ";
         sql += "from vendedores v ";
         sql += "where v.indSituacao = 'A'";
-        return consulta(sql, 'Não foi possível localizar!')
+        return consulta(sql, 'Erro Movel findVendedores!')
     }
 
     findPipeMovel(pDataIni, pDataFim) {
@@ -332,7 +332,7 @@ class MovelRepository {
             "where v.data between ? and ? ";
 
         // 
-        return consulta(sql, [pDataIni, pDataFim, pDataIni, pDataFim], 'Não foi possível localizar!')
+        return consulta(sql, [pDataIni, pDataFim, pDataIni, pDataFim], 'Erro Movel findPipeMovel!')
 
     }
 
@@ -376,7 +376,7 @@ class MovelRepository {
         sql += "        left join gestorFunil g on (g.codProfissao = l.codProfissao)  ";
         sql += "                            and (g.id = l.idGestor)          ";
         sql += "where l.datRegistro between ? and ? ";
-        return consulta(sql, [pDataIni, pDataFim], 'Não foi possível localizar!')
+        return consulta(sql, [pDataIni, pDataFim], 'Erro Movel findPipeEventos!')
     }
 
     findRetornoVisita() {
@@ -472,7 +472,7 @@ class MovelRepository {
         sql += "                           and (vend.id = p.idVendedor) ";
         sql += "    left join vendedores vend2 on (vend2.id = p.idVendedor) ";
         sql += "where p.indSync is not null ";
-        return consulta(sql, 'Não foi possível localizar!')
+        return consulta(sql, 'Erro Movel findRetornoVisita!')
     }
 
     findRetornoParceiros() {
@@ -568,7 +568,7 @@ class MovelRepository {
         sql += "                           and (vend.id = p.idVendedor) ";
         sql += "    left join vendedores vend2 on (vend2.id = p.idVendedor) ";
         sql += "where p.indSync is not null ";
-        return consulta(sql, 'Não foi possível localizar!')
+        return consulta(sql, 'Erro Movel findRetornoParceiros!')
     }
 
     findRetornoEventos() {
@@ -624,7 +624,7 @@ class MovelRepository {
         sql += "                           and (vend.id = l.idGestor) ";
         sql += "    left join eventoFunil evf on (evf.codEvento = l.codEvento)  ";
         sql += "where l.indSync is not null ";
-        return consulta(sql, 'Não foi possível localizar!')
+        return consulta(sql, 'Erro Movel findRetornoEventos!')
     }
 
 }

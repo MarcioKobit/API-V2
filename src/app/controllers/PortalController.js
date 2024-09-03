@@ -284,76 +284,67 @@ class PortalController {
         res.json(wArray);
     }
 
-    async storeInstalacaoFoto(req, res) {
-        // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
-        if (!wOjJWT[0]) { return false; };
-        const { codempresa, id } = wOjJWT[1]
-        // ####### Validacao do JWT #######
+    async storePremios(req, res) {
 
-        const corpo = req.body;
-        var wArray = [];
+        const jwt = req.headers["authorization"] || req.headers["x-access-token"];
+        const objAPI = await UsuarioRepository.validaToken(jwt);
 
+        if (objAPI.length == 0) {
+            var wArray = {
+                STATUS: false,
+                RECORDS: 1,
+                DATA: [{
+                    MENSAGEM: 'Token Inválido'
+                }]
+            };
 
-        var length = Object.keys(corpo).length;
-
-        // console.log("R: " + length)
-        var wArrayData = []
-        for (var i = 0; i < length; i++) {
-
-            switch (corpo[i].INDSYNC) {
-                case "S":
-                    corpo[i].FOTO = await auxiliares.resizeBase64({ base64Image: corpo[i].FOTO, maxWidth: 800 });
-                    InstalacoesRepository.createinstalacoesServicoFoto(corpo[i]);
-                    break;
-                case "D":
-                    InstalacoesRepository.removeServicoFoto(corpo[i]);
-                    break;
-            }
-
+            res.json(wArray);
+            return false;
         }
 
-        wArray.push({
-            STATUS: true,
-            RECORDS: length,
-            DATA: wArrayData
-        });
-
-        res.json(wArray);
-    }
-
-    async updateInstalacao(req, res) {
-        // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
-        if (!wOjJWT[0]) { return false; };
-        const { codempresa, id } = wOjJWT[1]
-        // ####### Validacao do JWT #######
 
         const corpo = req.body;
-        var wArray = [];
+        var wArray = {
+            STATUS: false,
+            RECORDS: 0,
+            DATA: []
+        };
 
-        var length = Object.keys(corpo).length;
+        // return false;
         var wArrayData = []
-        for (var i = 0; i < length; i++) {
+        for (var i = 0; i < corpo.RECORDS; i++) {
+            try {
+                await PortalRepository.createPremios(corpo.DATA[i]).then((resposta) => {
+                    if (resposta.insertId > 0) {
 
-            switch (corpo[i].INDACAO) {
-                case "I":
-                    InstalacoesRepository.updateInstalacao(corpo[i]);
-                    break;
-                case "S":
-                    InstalacoesRepository.updateInstalacaoServico(corpo[i]);
-                    break;
+                        var data = {
+                            IDINT: resposta.insertId,
+                            IDPROPOSTA: corpo.DATA[i].IDPROPOSTA,
+                            ACAO: 'INS'
+                        }
+
+                        wArrayData.push(data);
+
+                        for (var x = 0; x < corpo.DATA[i].FOTOS.length; x++) {
+                            PortalRepository.createPremiosFotos(resposta.insertId, corpo.DATA[i].FOTOS[x]);
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.log(error)
             }
         }
 
-        wArray.push({
+        wArray = {
             STATUS: true,
-            RECORDS: length,
+            RECORDS: wArrayData.length,
             DATA: wArrayData
-        });
+        };
+
 
         res.json(wArray);
-    }
+    }    
 
 }
 

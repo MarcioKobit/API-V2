@@ -1,54 +1,62 @@
-[
-    {
-        "INDACAO": "A",
-        "IDINT": 4564.0,
-        "DATREGISTRO": "2024-06-05",
-        "PROPOSTA": "339297-1",
-        "IDPROPOSTA": "331165",
-        "SEQINSTALL": "1",
-        "CLIENTE": "MARCELO DE RESENDE CASTANHO",
-        "NUMTELEFONE": "(41) 99992-8062",
-        "ENDERECO": "RUA DOUTOR EDMIR SILVEIRA D\u0027ÁVILA, 333",
-        "BAIRRO": "SEMINÁRIO",
-        "CEP": "80310510",
-        "CIDADE": "CURITIBA",
-        "UF": "PR",
-        "INSTALADOR": "47300586000173",
-        "DATATRIBUIDO": "2024-06-05",
-        "DATAGENDA": "2024-06-05",
-        "SERVICOS": [
-            {
-                "SEQ": "1988885@3",
-                "DESCRICAO": "PORTA LISA 70X210 SOLIDO BRANCO - despensa"
-            }
-        ]
+{
+    "2024-08-09": {
+        "color": "#48f85a",
+        "endingDay": false,
+        "startingDay": true,
+        "textColor": "white"
+    },
+    "2024-08-10": {
+        "color": "#48f85a",
+        "endingDay": false,
+        "startingDay": false,
+        "textColor": "white"
+    },
+    "2024-08-11": {
+        "color": "#48f85a",
+        "endingDay": true,
+        "startingDay": false,
+        "textColor": "white"
+    },
+    "2024-08-12": {
+        "color": "#edbc4a",
+        "endingDay": false,
+        "startingDay": true,
+        "textColor": "white"
+    },
+    "2024-08-13": {
+        "color": "#edbc4a",
+        "endingDay": false,
+        "startingDay": false,
+        "textColor": "white"
+    },
+    "2024-08-14": {
+        "color": "#edbc4a",
+        "endingDay": true,
+        "startingDay": false,
+        "textColor": "white"
+    },
+    "2024-08-16": {
+        "color": "#f648f6",
+        "endingDay": false,
+        "startingDay": true,
+        "textColor": "white"
+    },
+    "2024-08-17": {
+        "color": "#f648f6",
+        "endingDay": false,
+        "startingDay": false,
+        "textColor": "white"
+    },
+    "2024-08-18": {
+        "color": "#f648f6",
+        "endingDay": false,
+        "startingDay": false,
+        "textColor": "white"
+    },
+    "2024-08-19": {
+        "color": "#f648f6",
+        "endingDay": true,
+        "startingDay": false,
+        "textColor": "white"
     }
-]
-
-
-[
-    {
-        "INDACAO": "A",
-        "IDINT": 4564,
-        "PROPOSTA": "9997-1",
-        "IDPROPOSTA": "999999",
-        "SEQINSTALL": "1",
-        "CLIENTE": "Marcio Manoel da Silva",
-        "NUMTELEFONE": "(47) 98811-2917",
-        "ENDERECO": "Estrada Bananal, 1439 - Casa 81",
-        "BAIRRO": "Beira Rio",
-        "CEP": "89270-000",
-        "CIDADE": "Guaramirim",
-        "UF": "SC",
-        "INSTALADOR": "02925364969",
-        "DATATRIBUIDO": "2022-12-07",
-        "DATAGENDA": "2022-12-07",
-        "SERVICOS": [
-            {
-                "SEQ": "1988885@3",
-                "DESCRICAO": "Porta Sacada",
-                "INDITEM": "P"
-            }
-        ]
-    }
-]
+}
