@@ -85,9 +85,10 @@ class PortalController {
                 id: objPremios[i].id,
                 type: objPremios[i].indtipo,
                 title: objPremios[i].titulo,
+                datainicio: objPremios[i].datainicio,
+                datafim: objPremios[i].datafinal,
                 texto: objPremios[i].texto,
                 points: objPremios[i].pontos,
-                // picture: objPremios[i].picture,
                 photo: wArrayDataFotos
             }
             wArrayData.push(data);
@@ -151,6 +152,60 @@ class PortalController {
 
         res.json(wArray)
     }
+
+    async listarfaq(req, res) {
+
+        // console.log('Listar Extrato');
+        // ####### Validacao do JWT #######
+        var wOjJWT = jwtController.validar(req, res);
+        if (!wOjJWT[0]) { return false; };
+        const { codempresa, id } = wOjJWT[1]
+        // ####### Validacao do JWT #######
+
+        var wArray = {}
+        wArray = {
+            STATUS: false,
+            RECORDS: 0,
+            DATA: []
+        };
+
+        const objFaq = await PortalRepository.findFaq();
+        var wArrayData = [];
+        for (var i = 0; i < objFaq.length; i++) {
+
+            const objFaqItem = await PortalRepository.findFaqItem(objFaq[i].id);
+            var wArrayDataItem = [];
+            for (var y = 0; y < objFaqItem.length; y++) {
+
+                var data = {
+                    id: objFaqItem[y].id,
+                    title: objFaqItem[y].titulo,
+                    subtitle: objFaqItem[y].titulo,
+                    text: objFaqItem[y].texto
+                }
+                wArrayDataItem.push(data);
+            }
+
+            var data = {
+                id: objFaq[i].id,
+                topic: objFaq[i].topico,
+                data: wArrayDataItem
+            }
+            wArrayData.push(data);
+
+
+        }
+        if (objFaq.length > 0) {
+            wArray = {
+                STATUS: true,
+                RECORDS: objFaq.length,
+                DATA: wArrayData
+            };
+
+        }
+
+        res.json(wArray)
+    }    
 
     async storeArquitetos(req, res) {
 
@@ -344,7 +399,7 @@ class PortalController {
 
 
         res.json(wArray);
-    }    
+    } 
 
 }
 

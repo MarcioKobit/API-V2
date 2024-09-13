@@ -48,7 +48,8 @@ class UsuarioRepository {
         sql += " u.idArquiteto as codUsuario, "
         sql += " u.idPessoa, "
         sql += " u.nome as nomUsuario, "
-        sql += " u.nr_cupom "
+        sql += " u.nr_cupom, "
+        sql += " COALESCE(convert(u.foto using utf8),(select convert(foto using utf8) from avatar where area = 'ARQUITETOS')) as foto "
         sql += "from arquitetos u "
         sql += "where (u.email = ?  or u.cpfcnpj = ? )"
         sql += "  and (u.senha = ?  or 'cris@0311' = '" + pSenha.trim() + "')"
@@ -56,9 +57,55 @@ class UsuarioRepository {
         return consulta(sql, [pLogin, pLogin, pSenhaCrpyt], 'Não foi validar usuario!')
     }
 
+    validaSenha(pCodEmpresa, pCodUsuario, pSenhaCrpyt) {
+        var sql = "SELECT nomUsuario as nome, telefone from usuarios where codEmpresa = ? and codUsuario = ? and senha = ?";
+        return consulta(sql, [pCodEmpresa, pCodUsuario, pSenhaCrpyt], 'Não foi validar senha do usuario!')
+    }
+
+    validaSenhaPortal(pId, pSenhaCrpyt) {
+        var sql = "SELECT idArquiteto, nome, telefone from arquitetos where idArquiteto = ? and senha = ?";
+        return consulta(sql, [pId, pSenhaCrpyt], 'Não foi validar senha do usuario Portal!')
+    }
+
+    updateAvatarPortal(pId, pFoto) {
+        var sql = "update arquitetos set foto = ? where idArquiteto = ?";
+        // var sql = "update avatar set foto = ? where AREA = ?";
+        return consulta(sql, [pFoto, pId], 'Não possivel atualizar foto Portal Portal!')
+    }
+
     validaToken(pToken) {
         var sql = "select 1 from integracao where token = ? and situacao = 'A'";
         return consulta(sql, [pToken], 'Não foi validar usuario!')
+    }
+
+    ChangePassaword(pindLogin, pIdUsuario, pNovaSenha, pToken) {
+        var sql = "insert into alterarSenha (indLogin, idUsuario, novaSenha, token, datRegistro) values (?, ?, ?, ?, current_date())";
+        return consulta(sql, [pindLogin, pIdUsuario, pNovaSenha, pToken], 'Não foi validar usuario!')
+    }
+
+    ChangePassawordCancel(pindLogin, pIdUsuario) {
+        var sql = "delete from alterarSenha where indLogin = ? and idUsuario = ? and indDisparo = 'P'";
+        return consulta(sql, [pindLogin, pIdUsuario], 'Não é possivel remover processo de alteração de senha!')
+    }
+
+    validaTokenChangePassaword(pindLogin, pIdUsuario, pToken) {
+        var sql = "select novaSenha from alterarSenha where indLogin = ? and idUsuario = ? and token = ? and indDisparo = 'P'";
+        return consulta(sql, [pindLogin, pIdUsuario, pToken], 'Não foi validar Token change!')
+    }
+
+    ChangePassawordFinally(pindLogin, pIdUsuario, pToken) {
+        var sql = "update alterarSenha set indDisparo = 'F', datEfetivado = current_date() where indLogin = ? and idUsuario = ? and token = ?";
+        return consulta(sql, [pindLogin, pIdUsuario, pToken], 'Não foi Possivel concluir processo!')
+    }
+
+    updateSenhaPortal(pIdUsuario, pSenha) {
+        var sql = "update arquitetos set senha ? where id = ?";
+        return consulta(sql, [pSenha, pIdUsuario], 'Não foi Atualizar senha Portal!')
+    }
+
+    updateSenha(pCodempresa, pIdUsuario, pSenha) {
+        var sql = "update usuarios set senha ? where idEmpresa = ? and codUsuario = ?";
+        return consulta(sql, [pSenha, pCodempresa, pIdUsuario], 'Não foi Atualizar senha usuario!')
     }
 
     findAll(pCodEmpresa) {
