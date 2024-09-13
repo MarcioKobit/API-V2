@@ -53,7 +53,7 @@ class InstalacoesRepository {
 
 
     updateInstalacaoAgenda(reg) {
-        var sql = "update instalacoes set datagendado = ?, datAgendadoFim = ? DATAGENDAFIM  where orderid = ? and seqInstall = ?";
+        var sql = "update instalacoes set datagendado = ?, datAgendadoFim = ?  where orderid = ? and seqInstall = ?";
         return consulta(sql, [reg.DATAGENDA, reg.DATAGENDAFIM, reg.IDPROPOSTA, reg.SEQINSTALL], 'Não foi possível atualizar instalacao!')
     }
 

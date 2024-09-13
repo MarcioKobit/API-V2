@@ -19,8 +19,8 @@ class PortalRepository {
     }
 
     createPremios(reg) {
-        var sql = "insert into premios (idfluig, indtipo, titulo, texto, pontos, status) values (?, ?, ?, ?, ?, ?)";
-        return consulta(sql, [reg.ID, (reg.RESGATE == true ? 'R' : 'A'), reg.TITULO, reg.TEXTO, parseInt(reg.PONTOS), 'A'], 'Não Incluir o Premio!')
+        var sql = "insert into premios (idfluig, indtipo, titulo, dataInicio, datafinal, texto, pontos, status) values (?, ?, ?, ?, ?, ?)";
+        return consulta(sql, [reg.ID, (reg.RESGATE == true ? 'R' : 'A'), reg.TITULO, reg.DATAINIRESGATE, reg.DATAFIMRESGATE, reg.TEXTO, parseInt(reg.PONTOS), 'A'], 'Não Incluir o Premio!')
     }
 
     createPremiosFotos(idpremio, reg) {
@@ -29,39 +29,43 @@ class PortalRepository {
     }    
 
     findAll() {
-
-        var sql = "select id, indtipo, titulo, '' as texto, pontos from premios where status = 'A'";
+        var sql = "select id, indtipo, titulo, texto, pontos, DATE_FORMAT(datainicio, '%d/%m/%Y' ) as datainicio, DATE_FORMAT(datafinal, '%d/%m/%Y' ) as datafinal from premios where status = 'A'";
         return consulta(sql, 'Erro Portal findAll!')
     }
 
     findByID(idPremio) {
-
-        var sql = "select id, indtipo, titulo, texto, pontos, convert(foto using utf8) as picture from premios where status = 'A' and id = ?";
+        var sql = "select id, indtipo, titulo, texto, pontos, DATE_FORMAT(datainicio, '%d/%m/%Y' ) as datainicio, DATE_FORMAT(datafinal, '%d/%m/%Y' ) as datafinal from premios where status = 'A' and id = ?";
         return consulta(sql, [idPremio], 'Erro Portal findByID!')
     }
 
     findNotByID(idPremio) {
-
-        var sql = "select id, indtipo, titulo, texto, pontos, convert(foto using utf8) as picture from premios where status = 'A' and id <> ?";
+        var sql = "select id, indtipo, titulo, texto, pontos, DATE_FORMAT(datainicio, '%d/%m/%Y' ) as datainicio, DATE_FORMAT(datafinal, '%d/%m/%Y' ) as datafinal from premios where status = 'A' and id <> ?";
         return consulta(sql, [idPremio], 'Erro Portal findNotByID!')
     }
 
     findPontosByID(idusuario) {
-
         var sql = "select codusuario, sum(pontos) as numpontos from extrato where codusuario = ?";
         return consulta(sql, [idusuario], 'Erro Portal findPontosByID!')
     }
 
     findFotosByID(idPremio) {
-
         var sql = "select id, idpremio, convert(foto using utf8) as foto from premios_fotos where idpremio = ?";
         return consulta(sql, [idPremio], 'Erro Portal findFotosByID!')
     }
 
     findExtratoByID(idUsuario) {
-
         var sql = "select idproposta, numproposta, nomcliente, valor, pontos, loja, DATE_FORMAT(datacompra, '%d/%m/%Y' ) as datacompra from extrato where codusuario = ?";
         return consulta(sql, [idUsuario], 'Erro Portal findExtratoByID!')
+    }
+
+    findFaq() {
+        var sql = "select id, topico from faq_portal where situacao = 'A'";
+        return consulta(sql, 'Erro Portal findFaq!')
+    }
+
+    findFaqItem(idFaq) {
+        var sql = "select id, titulo, texto from faq_portal_item where id_topico = ?";
+        return consulta(sql, [idFaq], 'Erro Portal findFaqItem!')
     }
 
 

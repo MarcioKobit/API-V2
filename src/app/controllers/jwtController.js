@@ -1,6 +1,4 @@
-// import { Console } from 'console';
 import jwt from 'jsonwebtoken';
-// const crypto = require("crypto");
 import crypto from 'crypto';
 const { sign, verify } = jwt;
 

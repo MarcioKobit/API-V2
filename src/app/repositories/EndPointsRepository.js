@@ -3,15 +3,16 @@ import { consulta } from '../database/conexao.js'
 class EndPointsRepository {
     // CRUD
 
-    findAll() {
-        const sql = "SELECT " +
+    findAll(ambiente) {
+        var sql = "SELECT " +
             "   e.method, " +
             "   e.endpoint, " +
             "   r.rota, " +
             "   e.endfunction  " +
             " FROM endpoints e " +
-            "     inner join rota_endpoint r on(r.id = e.idrota) " +
-            " where e.ind_situacao = 'A' "
+            "     inner join rota_endpoint r on(r.id = e.idrota) ";
+
+        if (ambiente == 'PRD') { sql += " where e.ind_situacao = 'A'" }
         return consulta(sql, 'Não foi possível localizar!')
     }
 
