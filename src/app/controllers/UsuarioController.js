@@ -4,6 +4,7 @@ import UsuarioRepository from '../repositories/UsuarioRepository.js'
 
 import jwtController from './jwtController.js';
 import AUXController from './AuxiliaresController.js';
+import AuxiliaresController from './AuxiliaresController.js';
 
 
 class UsuarioController {
@@ -16,7 +17,28 @@ class UsuarioController {
             DATA: []
         });
 
-        res.json(wArray)
+		res.json(wArray);
+		res.end();
+
+	}
+
+	async cep(req, res) {
+		// ####### Validacao do JWT #######
+		var wOjJWT = jwtController.validar(req, res);
+		if (!wOjJWT[0]) { return false; };
+		const { codempresa, id } = wOjJWT[1]
+		// ####### Validacao do JWT #######
+
+		var wArray = {};
+		const objCep = await AuxiliaresController.getDadosCEP(req.query.cep)
+		wArray = {
+			STATUS: objCep[0],
+			RECORDS: objCep[0] == true ? 1 : 0,
+			DATA: objCep[1]
+		};
+
+		res.json(wArray);
+		res.end();
 
     }
 
@@ -57,18 +79,18 @@ class UsuarioController {
         }
 
 
-        res.json(wArray)
+		res.json(wArray);
+		res.end();
     }
 
     async login(req, res) {
-
-        // console.log(req);
 
         const corpo = req.body;
         var wArray = {};
         var wOjSenha = jwtController.encrypt(corpo.SENHA);
         if (!wOjSenha[0]) { return false; };
-        const row = (corpo.AREA == undefined || corpo.AREA == '' || corpo.AREA == 'APP') ? await UsuarioRepository.login(corpo.LOGIN, wOjSenha[1], corpo.SENHA) : await UsuarioRepository.loginPortal(corpo.LOGIN, wOjSenha[1], corpo.SENHA)
+
+		const row = (corpo.AREA == undefined || corpo.AREA == '' || corpo.AREA == 'APP') ? await UsuarioRepository.login(corpo.LOGIN, wOjSenha[1], corpo.SENHA) : await UsuarioRepository.loginPortal(corpo.LOGIN, wOjSenha[1], corpo.SENHA);
 
         var length = Object.keys(row).length;
         if (length > 0) {
@@ -86,12 +108,9 @@ class UsuarioController {
                         id: row[i].codUsuario,
                         idPessoa: row[i].idPessoa,
                         nome: row[i].nomUsuario,
-                        nr_cupom: row[i].nr_cupom
-
-
+						nr_cupom: row[i].nr_cupom
                     };
                 }
-
 
                 // ####### Criaçao do JWT #######
                 var wOjJWT = jwtController.criar(dadosUsuario, res);
@@ -106,7 +125,6 @@ class UsuarioController {
                     wRota = objAmbiente[0].rota;
                 }
 
-                // console.log(row[i]);
                 var data = {
                     ID: row[i].codUsuario,
                     IDPESSOA: row[i].idPessoa,
@@ -122,19 +140,19 @@ class UsuarioController {
                     STATUS: true,
                     RECORDS: length,
                     DATA: data
-                };
-                // console.log(wArray);
+				};
             }
             res.json(wArray);
+			res.end();
         } else {
             wArray = {
                 STATUS: false,
                 RECORDS: 0,
                 DATA: []
             };
-            // console.log(wArray);
+
             res.json(wArray);
-            // res.end();
+			res.end();
         }
 
         // res.json(wArray);
@@ -162,7 +180,11 @@ class UsuarioController {
                 var dadosUsuario = {};
                 if (row[0].telefone != null && row[0].telefone != '') {
 
-                    const objLoginFortics = await AUXController.loginFortics();
+					const objParans = await UsuarioRepository.getParans();
+					var lengthParam = Object.keys(objParans).length;
+					if (lengthParam == 0) { return false; }
+
+					const objLoginFortics = await AUXController.loginFortics(JSON.parse(objParans[0].paramFortics));
                     if (objLoginFortics[0] == true) {
 
                         var wNumTelefone = (row[0].telefone.substring(0, 2) != "55" ? '55' + justNumbers(row[0].telefone) : justNumbers(row[0].telefone));
@@ -229,6 +251,7 @@ class UsuarioController {
         };
 
         res.json(wArray);
+		res.end();
     }
 
     async updateAvatar(req, res) {
@@ -266,7 +289,8 @@ class UsuarioController {
         }
 
         res.json(wArray);
-    }    
+		res.end();
+	}
 
     async store(req, res) {
 
@@ -282,6 +306,7 @@ class UsuarioController {
                 }]
             };
             res.json(wArray);
+			res.end();
             return false;
         }
 
@@ -335,6 +360,7 @@ class UsuarioController {
         };
 
         res.json(wArray);
+		res.end();
     }
 }
 

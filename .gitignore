@@ -1,5 +1,9 @@
 node_modules
 .env
+.dockerignore
+.gitignore
 Publicar AWS.txt
 Arquivos Locais
+cert
+jest.json
 retorno.json

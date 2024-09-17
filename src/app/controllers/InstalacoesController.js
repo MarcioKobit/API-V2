@@ -111,7 +111,8 @@ class InstalacoesController {
         }
 
 
-        res.json(wArray)
+		res.json(wArray);
+		res.end();
     }
 
     async listarInstalacoes(req, res) {
@@ -124,14 +125,6 @@ class InstalacoesController {
         // ####### Validacao do JWT #######
 
         const { idproposta, seqinstall, fotos, servico } = req.query;
-
-        // console.log(idproposta);
-
-
-        // var wArrayData = [];
-        // res.json(wArrayData);
-
-        // return false
 
         var wArray = [];
         wArray.push({
@@ -208,7 +201,8 @@ class InstalacoesController {
 
         }
 
-        res.json(wArrayData)
+		res.json(wArrayData);
+		res.end();
     }
 
     async storeInstalacoes(req, res) {
@@ -225,7 +219,8 @@ class InstalacoesController {
                     MENSAGEM: 'Token Inválido'
                 }]
             };
-            res.json(wArray);
+			res.json(wArray);
+			res.end();
             return false;
         }
 
@@ -317,7 +312,8 @@ class InstalacoesController {
         };
 
 
-        res.json(wArray);
+		res.json(wArray);
+		res.end();
     }
 
     async storeInstalacaoFoto(req, res) {
@@ -355,7 +351,8 @@ class InstalacoesController {
             DATA: wArrayData
         });
 
-        res.json(wArray);
+		res.json(wArray);
+		res.end();
     }
 
     async updateInstalacao(req, res) {
@@ -388,7 +385,8 @@ class InstalacoesController {
             DATA: wArrayData
         });
 
-        res.json(wArray);
+		res.json(wArray);
+		res.end();
     }
 
 }

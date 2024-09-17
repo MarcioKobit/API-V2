@@ -13,6 +13,7 @@ const router = Router()
 // ROTAS
 router.get('/', UsuarioController.home)
 router.post('/login', UsuarioController.login)
+router.get('/cep', UsuarioController.cep)
 
 
 var wEndpoints = await EndPointController.listar();

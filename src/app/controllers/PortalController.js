@@ -3,14 +3,51 @@ import PortalRepository from '../repositories/PortalRepository.js';
 import UsuarioRepository from '../repositories/UsuarioRepository.js';
 import jwtController from './jwtController.js';
 import auxiliares from '../components/auxiliares.js';
+import AuxiliaresController from './AuxiliaresController.js';
 
 
 class PortalController {
 
 
+	async listarDadosSIS(req, res) {
+
+		// ####### Validacao do JWT #######
+		var wOjJWT = jwtController.validar(req, res);
+		if (!wOjJWT[0]) { return false; };
+		const { codempresa, id, idPessoa } = wOjJWT[1];
+		// ####### Validacao do JWT #######
+
+		var wArray = {}
+		wArray = {
+			STATUS: false,
+			RECORDS: 0,
+			DATA: []
+		};
+
+		const objParans = await UsuarioRepository.getParans();
+		var lengthParam = Object.keys(objParans).length;
+		if (lengthParam == 0) { return false; }
+
+		const objLoginFortics = await AuxiliaresController.getDadosSYS(idPessoa, objParans[0].tokenSIS);
+		const objUF = await PortalRepository.findAllUF();
+
+		var data = {
+			sys: objLoginFortics[1],
+			ufs: objUF
+		}
+
+		wArray = {
+			STATUS: objLoginFortics[0],
+			RECORDS: objLoginFortics[0] == true ? 1 : 0,
+			DATA: data
+		};
+
+		res.json(wArray);
+		res.end();
+	}
+
     async listarPontos(req, res) {
 
-        // console.log(req);
         // ####### Validacao do JWT #######
         var wOjJWT = jwtController.validar(req, res);
         if (!wOjJWT[0]) { return false; };
@@ -43,7 +80,8 @@ class PortalController {
             };
         }
 
-        res.json(wArray)
+		res.json(wArray);
+		res.end();
     }
 
     async listarPremios(req, res) {
@@ -104,7 +142,8 @@ class PortalController {
 
         }
 
-        res.json(wArray)
+		res.json(wArray);
+		res.end();
     }
 
     async listarExtrato(req, res) {
@@ -150,12 +189,12 @@ class PortalController {
 
         }
 
-        res.json(wArray)
+		res.json(wArray);
+		res.end();
     }
 
     async listarfaq(req, res) {
 
-        // console.log('Listar Extrato');
         // ####### Validacao do JWT #######
         var wOjJWT = jwtController.validar(req, res);
         if (!wOjJWT[0]) { return false; };
@@ -204,8 +243,9 @@ class PortalController {
 
         }
 
-        res.json(wArray)
-    }    
+		res.json(wArray);
+		res.end();
+	}
 
     async storeArquitetos(req, res) {
 
@@ -221,6 +261,7 @@ class PortalController {
                 }]
             };
             res.json(wArray);
+			res.end();
             return false;
         }
 
@@ -230,8 +271,7 @@ class PortalController {
             RECORDS: 0,
             DATA: []
         };
-        // res.json(wArray);
-        // return false;
+
         var wArrayData = []
         for (var i = 0; i < corpo.RECORDS; i++) {
             var wOjSenha = jwtController.encrypt(corpo.DATA[i].SENHA);
@@ -279,6 +319,7 @@ class PortalController {
 
 
         res.json(wArray);
+		res.end();
     }
 
     async storeExtratos(req, res) {
@@ -296,6 +337,7 @@ class PortalController {
             };
 
             res.json(wArray);
+			res.end();
             return false;
         }
 
@@ -337,69 +379,125 @@ class PortalController {
 
 
         res.json(wArray);
+		res.end();
     }
+	// arquitetosDados
+	async storePremios(req, res) {
 
-    async storePremios(req, res) {
+		const jwt = req.headers["authorization"] || req.headers["x-access-token"];
+		const objAPI = await UsuarioRepository.validaToken(jwt);
 
-        const jwt = req.headers["authorization"] || req.headers["x-access-token"];
-        const objAPI = await UsuarioRepository.validaToken(jwt);
+		if (objAPI.length == 0) {
+			var wArray = {
+				STATUS: false,
+				RECORDS: 1,
+				DATA: [{
+					MENSAGEM: 'Token Inválido'
+				}]
+			};
 
-        if (objAPI.length == 0) {
-            var wArray = {
-                STATUS: false,
-                RECORDS: 1,
-                DATA: [{
-                    MENSAGEM: 'Token Inválido'
-                }]
-            };
-
-            res.json(wArray);
-            return false;
-        }
-
-
-        const corpo = req.body;
-        var wArray = {
-            STATUS: false,
-            RECORDS: 0,
-            DATA: []
-        };
-
-        // return false;
-        var wArrayData = []
-        for (var i = 0; i < corpo.RECORDS; i++) {
-            try {
-                await PortalRepository.createPremios(corpo.DATA[i]).then((resposta) => {
-                    if (resposta.insertId > 0) {
-
-                        var data = {
-                            IDINT: resposta.insertId,
-                            IDPROPOSTA: corpo.DATA[i].IDPROPOSTA,
-                            ACAO: 'INS'
-                        }
-
-                        wArrayData.push(data);
-
-                        for (var x = 0; x < corpo.DATA[i].FOTOS.length; x++) {
-                            PortalRepository.createPremiosFotos(resposta.insertId, corpo.DATA[i].FOTOS[x]);
-                        }
-                    }
-                });
-
-            } catch (error) {
-                console.log(error)
-            }
-        }
-
-        wArray = {
-            STATUS: true,
-            RECORDS: wArrayData.length,
-            DATA: wArrayData
-        };
+			res.json(wArray);
+			res.end();
+			return false;
+		}
 
 
-        res.json(wArray);
-    } 
+		const corpo = req.body;
+		var wArray = {
+			STATUS: false,
+			RECORDS: 0,
+			DATA: []
+		};
+
+		// return false;
+		var wArrayData = []
+		for (var i = 0; i < corpo.RECORDS; i++) {
+			try {
+				await PortalRepository.createPremios(corpo.DATA[i]).then((resposta) => {
+					if (resposta.insertId > 0) {
+
+						var data = {
+							IDINT: resposta.insertId,
+							IDPROPOSTA: corpo.DATA[i].IDPROPOSTA,
+							ACAO: 'INS'
+						}
+
+						wArrayData.push(data);
+
+						for (var x = 0; x < corpo.DATA[i].FOTOS.length; x++) {
+							PortalRepository.createPremiosFotos(resposta.insertId, corpo.DATA[i].FOTOS[x]);
+						}
+					}
+				});
+
+			} catch (error) {
+				console.log(error)
+			}
+		}
+
+		wArray = {
+			STATUS: true,
+			RECORDS: wArrayData.length,
+			DATA: wArrayData
+		};
+
+
+		res.json(wArray);
+		res.end();
+	}
+
+	async updateArquietos(req, res) {
+
+		// ####### Validacao do JWT #######
+		var wOjJWT = jwtController.validar(req, res);
+		if (!wOjJWT[0]) { return false; };
+		const { codempresa, id } = wOjJWT[1]
+		// ####### Validacao do JWT #######
+
+
+		const corpo = req.body;
+		var wArray = {
+			STATUS: false,
+			RECORDS: 0,
+			DATA: []
+		};
+
+		// return false;
+		var wArrayData = []
+		for (var i = 0; i < corpo.RECORDS; i++) {
+			try {
+				await PortalRepository.createPremios(corpo.DATA[i]).then((resposta) => {
+					if (resposta.insertId > 0) {
+
+						var data = {
+							IDINT: resposta.insertId,
+							IDPROPOSTA: corpo.DATA[i].IDPROPOSTA,
+							ACAO: 'INS'
+						}
+
+						wArrayData.push(data);
+
+						for (var x = 0; x < corpo.DATA[i].FOTOS.length; x++) {
+							PortalRepository.createPremiosFotos(resposta.insertId, corpo.DATA[i].FOTOS[x]);
+						}
+					}
+				});
+
+			} catch (error) {
+				console.log(error)
+			}
+		}
+
+		wArray = {
+			STATUS: true,
+			RECORDS: wArrayData.length,
+			DATA: wArrayData
+		};
+
+
+		res.json(wArray);
+		res.end();
+	}
 
 }
 

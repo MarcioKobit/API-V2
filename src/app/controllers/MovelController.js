@@ -187,7 +187,8 @@ class MovelController {
         }
 
 
-        res.json(wArray)
+		res.json(wArray);
+		res.end();
     }
 
     async showTipoLocal(req, res) {
@@ -225,7 +226,8 @@ class MovelController {
         }
 
 
-        res.json(wArray)
+		res.json(wArray);
+		res.end();
     }
 
     async showCidades(req, res) {
@@ -265,7 +267,8 @@ class MovelController {
         }
 
 
-        res.json(wArray)
+		res.json(wArray);
+		res.end();
     }
 
     async showProfissoes(req, res) {
@@ -304,7 +307,8 @@ class MovelController {
         }
 
 
-        res.json(wArray)
+		res.json(wArray);
+		res.end();
     }
 
     async showVendedores(req, res) {
@@ -336,7 +340,8 @@ class MovelController {
             DATA: wArrayData
         });
 
-        res.json(wArray)
+		res.json(wArray);
+		res.end();
     }
 
     async showPipe(req, res) {
@@ -437,7 +442,8 @@ class MovelController {
             DATA: wArrayData
         };
 
-        res.json(wArray)
+		res.json(wArray);
+		res.end();
     }
 
     async showRetornoFluig(req, res) {
@@ -596,7 +602,8 @@ class MovelController {
             DATA: wArrayData
         });
 
-        res.json(wArray)
+		res.json(wArray);
+		res.end();
     }
 
     async storeRetornoFluig(req, res) {
@@ -657,7 +664,8 @@ class MovelController {
         });
 
 
-        res.json(wArray);
+		res.json(wArray);
+		res.end();
     }
 
     async storeTipoLocal(req, res) {
@@ -688,7 +696,8 @@ class MovelController {
             DATA: []
         });
 
-        res.json(wArray);
+		res.json(wArray);
+		res.end();
     }
 
     async storeTipoVisita(req, res) {
@@ -719,7 +728,8 @@ class MovelController {
             DATA: []
         });
 
-        res.json(wArray);
+		res.json(wArray);
+		res.end();
     }
 
     async storeCidades(req, res) {
@@ -750,7 +760,8 @@ class MovelController {
             DATA: []
         });
 
-        res.json(wArray);
+		res.json(wArray);
+		res.end();
     }
 
     async storeVendedores(req, res) {
@@ -781,7 +792,8 @@ class MovelController {
             DATA: wArrayData
         });
 
-        res.json(wArray);
+		res.json(wArray);
+		res.end();
     }
 
     async updateInstalacao(req, res) {
@@ -814,7 +826,8 @@ class MovelController {
             DATA: wArrayData
         });
 
-        res.json(wArray);
+		res.json(wArray);
+		res.end();
     }
 
 }
