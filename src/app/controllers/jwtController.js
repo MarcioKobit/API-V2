@@ -4,7 +4,7 @@ const { sign, verify } = jwt;
 
 class JWTController {
 
-    criar(jSonDados, res) {
+	criarJWT(jSonDados, res) {
         try {
             const token = jwt.sign(jSonDados, process.env.SECRET);
             return [true, token];
@@ -16,7 +16,7 @@ class JWTController {
 
     }
 
-    validar(req, res) {
+	validarJWT(req, res) {
         const jwt = req.headers["authorization"] || req.headers["x-access-token"];
         try {
             const verifycode = verify(jwt, process.env.SECRET);
@@ -28,13 +28,10 @@ class JWTController {
         }
     }
 
-    encrypt(senha) {
+	encryptPass(senha) {
         try {
             return [true, crypto.createHash('md5').update(senha).digest("hex")];
-        } catch (error) {
-            // console.log(error)
-            // res.status(403);
-            // res.end();
+		} catch (error) {
             return [false, null];
         }
     }

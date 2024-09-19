@@ -10,7 +10,7 @@ class InstalacoesController {
 
     async showInstalacoes(req, res) {
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
+        var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######
@@ -119,7 +119,7 @@ class InstalacoesController {
 
         // console.log(req.query.proposta);
         // ####### Validacao do JWT #######
-        // var wOjJWT = jwtController.validar(req, res);
+        // var wOjJWT = jwtController.validarJWT(req, res);
         // if (!wOjJWT[0]) { return false; };
         // const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######
@@ -318,7 +318,7 @@ class InstalacoesController {
 
     async storeInstalacaoFoto(req, res) {
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
+        var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######
@@ -357,7 +357,7 @@ class InstalacoesController {
 
     async updateInstalacao(req, res) {
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
+        var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######

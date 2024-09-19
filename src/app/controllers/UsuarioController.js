@@ -24,7 +24,7 @@ class UsuarioController {
 
 	async cep(req, res) {
 		// ####### Validacao do JWT #######
-		var wOjJWT = jwtController.validar(req, res);
+		var wOjJWT = jwtController.validarJWT(req, res);
 		if (!wOjJWT[0]) { return false; };
 		const { codempresa, id } = wOjJWT[1]
 		// ####### Validacao do JWT #######
@@ -44,7 +44,7 @@ class UsuarioController {
 
     async index(req, res) {
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
+		var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######
@@ -87,7 +87,7 @@ class UsuarioController {
 
         const corpo = req.body;
         var wArray = {};
-        var wOjSenha = jwtController.encrypt(corpo.SENHA);
+		var wOjSenha = jwtController.encryptPass(corpo.SENHA);
         if (!wOjSenha[0]) { return false; };
 
 		const row = (corpo.AREA == undefined || corpo.AREA == '' || corpo.AREA == 'APP') ? await UsuarioRepository.login(corpo.LOGIN, wOjSenha[1], corpo.SENHA) : await UsuarioRepository.loginPortal(corpo.LOGIN, wOjSenha[1], corpo.SENHA);
@@ -113,7 +113,7 @@ class UsuarioController {
                 }
 
                 // ####### Criaçao do JWT #######
-                var wOjJWT = jwtController.criar(dadosUsuario, res);
+				var wOjJWT = jwtController.criarJWT(dadosUsuario, res);
                 if (!wOjJWT[0]) { return false; };
                 const token = wOjJWT[1]
                 // ####### Validacao do JWT #######
@@ -162,13 +162,13 @@ class UsuarioController {
 
         const corpo = req.body;
         var wArray = {};
-        var wOjJWT = jwtController.validar(req, res);
+		var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1];
 
         if (corpo.EFETIVAR == undefined || corpo.EFETIVAR == '') {
-            var wOjSenha = jwtController.encrypt(corpo.SENHA);
-            var wOjNovaSenha = jwtController.encrypt(corpo.NOVASENHA);
+			var wOjSenha = jwtController.encryptPass(corpo.SENHA);
+			var wOjNovaSenha = jwtController.encryptPass(corpo.NOVASENHA);
             if (!wOjSenha[0]) { return false; };
 
             const row = (corpo.AREA == undefined || corpo.AREA == '' || corpo.AREA == 'APP') ? await UsuarioRepository.validaSenha(codempresa, id, wOjSenha[1]) : await UsuarioRepository.validaSenhaPortal(id, wOjSenha[1]);
@@ -258,7 +258,7 @@ class UsuarioController {
 
         const corpo = req.body;
         var wArray = {};
-        var wOjJWT = jwtController.validar(req, res);
+		var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1];
 
@@ -292,7 +292,7 @@ class UsuarioController {
 		res.end();
 	}
 
-    async store(req, res) {
+	async store(req, res) {
 
         const jwt = req.headers["authorization"] || req.headers["x-access-token"];
         const objAPI = await UsuarioRepository.validaToken(jwt);
@@ -320,7 +320,7 @@ class UsuarioController {
 
         for (var i = 0; i < objUser.RECORDS; i++) {
             if (objUser.DATA[i].CRYPT == 'S') {
-                var wOjSenha = jwtController.encrypt(objUser.DATA[i].SENHA);
+				var wOjSenha = jwtController.encryptPass(objUser.DATA[i].SENHA);
                 if (!wOjSenha[0]) { continue; };
                 objUser.DATA[i].SENHA = wOjSenha[1]
             }
@@ -348,7 +348,8 @@ class UsuarioController {
                         }
                         wArrayData.push(data)
                     });
-                } catch (errorUPD) {
+				} catch (errorUPD) {
+					console.log('Erro UPD: ' + errorUPD)
                 }
             }
         }

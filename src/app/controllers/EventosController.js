@@ -8,7 +8,7 @@ class EventosController {
 
     async showEventos(req, res) {
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
+		var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######
@@ -101,7 +101,7 @@ class EventosController {
 
     async storeEventos(req, res) {
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
+		var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######
@@ -149,7 +149,7 @@ class EventosController {
 
     async storeLeadEvento(req, res) {
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
+		var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######

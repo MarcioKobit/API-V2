@@ -11,12 +11,24 @@ app.use(cors({
     origin: '*'
 }))
 
-
-
 // app.use(express.json())
 app.use(bodyParser.json({ limit: 1024 * 1024 * 20, type: 'application/json' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: 1024 * 1024 * 20, type: 'application/json' }));
-app.use(routes)
+app.use(routes);
+app.use(
+	(err, request, response, next) => {
+		if (err instanceof Error) {
+			return response.status(400).json({
+				message: err.message
+			});
+		}
+		return response.status(500).json({
+			status: "error",
+			message: "Internal server error - " + err
+		})
+	}
+);
 
 
-export default app
+// export default app
+export { app };

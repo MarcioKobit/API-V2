@@ -8,7 +8,7 @@ class MovelController {
 
     async showViagem(req, res) {
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
+        var wOjJWT = jwtController.validarJWT(req, res);
         // console.log(req)
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1]
@@ -193,7 +193,7 @@ class MovelController {
 
     async showTipoLocal(req, res) {
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
+        var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######
@@ -232,7 +232,7 @@ class MovelController {
 
     async showCidades(req, res) {
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
+        var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######
@@ -273,7 +273,7 @@ class MovelController {
 
     async showProfissoes(req, res) {
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
+        var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######
@@ -313,7 +313,7 @@ class MovelController {
 
     async showVendedores(req, res) {
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
+        var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######
@@ -346,7 +346,7 @@ class MovelController {
 
     async showPipe(req, res) {
         // // ####### Validacao do JWT #######
-        // var wOjJWT = jwtController.validar(req, res);
+        // var wOjJWT = jwtController.validarJWT(req, res);
         // if (!wOjJWT[0]) { return false; };
         // const { codempresa, id } = wOjJWT[1]
         // // ####### Validacao do JWT #######
@@ -448,7 +448,7 @@ class MovelController {
 
     async showRetornoFluig(req, res) {
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
+        var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######
@@ -608,7 +608,7 @@ class MovelController {
 
     async storeRetornoFluig(req, res) {
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
+        var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######
@@ -670,7 +670,7 @@ class MovelController {
 
     async storeTipoLocal(req, res) {
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
+        var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######
@@ -702,7 +702,7 @@ class MovelController {
 
     async storeTipoVisita(req, res) {
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
+        var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######
@@ -734,7 +734,7 @@ class MovelController {
 
     async storeCidades(req, res) {
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
+        var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######
@@ -766,7 +766,7 @@ class MovelController {
 
     async storeVendedores(req, res) {
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
+        var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######
@@ -798,7 +798,7 @@ class MovelController {
 
     async updateInstalacao(req, res) {
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
+        var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######

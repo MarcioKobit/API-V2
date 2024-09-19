@@ -12,7 +12,7 @@ class PortalController {
 	async listarDadosSIS(req, res) {
 
 		// ####### Validacao do JWT #######
-		var wOjJWT = jwtController.validar(req, res);
+		var wOjJWT = jwtController.validarJWT(req, res);
 		if (!wOjJWT[0]) { return false; };
 		const { codempresa, id, idPessoa } = wOjJWT[1];
 		// ####### Validacao do JWT #######
@@ -49,7 +49,7 @@ class PortalController {
     async listarPontos(req, res) {
 
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
+		var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######
@@ -88,7 +88,7 @@ class PortalController {
 
         // console.log(req);
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
+		var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######
@@ -150,7 +150,7 @@ class PortalController {
 
         // console.log('Listar Extrato');
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
+		var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######
@@ -196,7 +196,7 @@ class PortalController {
     async listarfaq(req, res) {
 
         // ####### Validacao do JWT #######
-        var wOjJWT = jwtController.validar(req, res);
+		var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
         const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######
@@ -274,7 +274,7 @@ class PortalController {
 
         var wArrayData = []
         for (var i = 0; i < corpo.RECORDS; i++) {
-            var wOjSenha = jwtController.encrypt(corpo.DATA[i].SENHA);
+			var wOjSenha = jwtController.encryptPass(corpo.DATA[i].SENHA);
             if (!wOjSenha[0]) { return false; };
             corpo.DATA[i].SENHA = wOjSenha[1];
 
@@ -449,7 +449,7 @@ class PortalController {
 	async updateArquietos(req, res) {
 
 		// ####### Validacao do JWT #######
-		var wOjJWT = jwtController.validar(req, res);
+		var wOjJWT = jwtController.validarJWT(req, res);
 		if (!wOjJWT[0]) { return false; };
 		const { codempresa, id } = wOjJWT[1]
 		// ####### Validacao do JWT #######
