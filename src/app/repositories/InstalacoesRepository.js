@@ -14,10 +14,15 @@ class InstalacoesRepository {
         return consulta(sql, [reg.IDPROPOSTA, reg.SEQINSTALL, regitem.SEQ, regitem.DESCRICAO], 'Error ao cadastrar instalacaoServico!')
     }
 
-    createinstalacoesServicoFoto(reg) {
-        var sql = "insert into instalacaoServicoFoto (idInstalacao, idServico, nomArquivo, foto) values (?, ?, ?, ?) ";
-        return consulta(sql, [reg.IDINSTALACAO, reg.IDSERVICO, reg.NOMARQUIVO, reg.FOTO], 'Error ao cadastrar instalacaoServicoFoto!')
-    }
+	createinstalacoesServicoFoto(reg) {
+		var sql = "insert into instalacaoServicoFoto (idInstalacao, idServico, nomArquivo, foto) values (?, ?, ?, ?) ";
+		return consulta(sql, [reg.IDINSTALACAO, reg.IDSERVICO, reg.NOMARQUIVO, reg.FOTO], 'Error ao cadastrar instalacaoServicoFoto!')
+	}
+
+	createFotoTMP(foto) {
+		var sql = "insert into fototmp (foto) values (?) ";
+		return consulta(sql, [foto, foto], 'Error ao foto TMP!')
+	}
 
     removeServicoFoto(reg) {
         var sql = "delete from instalacaoServicoFoto where idInstalacao = ? and idServico = ? and id = ?";
@@ -58,13 +63,13 @@ class InstalacoesRepository {
     }
 
     updateInstalacao(reg) {
-        var sql = "update instalacoes set indSituacao = ? where idInstalacao = ?";
-        return consulta(sql, [reg.STATUS, reg.IDINSTALACAO], 'Não foi possível atualizar instalacao 2!')
+		var sql = "update instalacoes set indSituacao = ?, latitudeR = ?, longitudeR = ?, observacao = ? where idInstalacao = ?";
+		return consulta(sql, [reg.STATUS, reg.LATITUDE, reg.LONGITUDE, reg.IDSEROBSVICO, reg.IDINSTALACAO], 'Não foi possível atualizar instalacao 2!')
     }
 
     updateInstalacaoServico(reg) {
         var sql = "update instalacaoServico set indSituacao = ?  where id = ? and  idInstalacao = ?";
-        return consulta(sql, [reg.STATUS, reg.IDSERVICO, reg.IDINSTALACAO], 'Não foi possível atualziar servicoFoto!')
+		return consulta(sql, [reg.STATUS, reg.IDSERVICO, reg.IDINSTALACAO], 'Não foi possível atualizar servico!')
     }
 
     findAll(pCodUsuario) {
@@ -88,7 +93,7 @@ class InstalacoesRepository {
         sql += "indSituacao ";
         sql += "from instalacoes ";
         sql += "where codUsuario = ? ";
-        sql += "  and indSituacao = 'P'";
+		sql += "  and indSituacao in ('P','E')";
 
         return consulta(sql, [pCodUsuario], 'Erro Instalador findAll!')
     }
@@ -114,7 +119,7 @@ class InstalacoesRepository {
         sql += "InsS.* ";
         sql += "from instalacaoServico InsS ";
         sql += "    inner join instalacoes i on (i.idInstalacao = InsS.idInstalacao) ";
-        sql += "                            and i.indSituacao = 'P'  ";
+		sql += "                            and i.indSituacao in ('P','E')  ";
         sql += "where i.codUsuario = ?";
         sql += " and i.idInstalacao = ?";
         sql += " and InsS.indSituacao = 'P'";

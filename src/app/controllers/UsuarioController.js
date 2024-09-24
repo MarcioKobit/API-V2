@@ -83,8 +83,7 @@ class UsuarioController {
 		res.end();
     }
 
-    async login(req, res) {
-
+	async login(req, res) {
         const corpo = req.body;
         var wArray = {};
 		var wOjSenha = jwtController.encryptPass(corpo.SENHA);

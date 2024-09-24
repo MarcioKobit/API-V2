@@ -4,24 +4,34 @@ class PortalRepository {
 
     // CRUD
     createArquiteto(reg) {
-		var sql = "insert into arquitetos (idPessoa, nome, cpfcnpj, email, senha, nr_cupom, telefone) values ( ?, ?, ?, ?, ?, ?, ?)";
-		return consulta(sql, [reg.IDPESSOA, reg.NOMUSUARIO, reg.CPFCNPJ, reg.EMAIL, reg.SENHA, reg.CUPOM, reg.TELEFONE], 'Erro Portal createArquiteto!')
+		var sql = "insert into arquitetos (idPessoa, nome, cpfcnpj, email, senha, nr_cupom, telefone, indSituacao) values ( ?, ?, ?, ?, ?, ?, ?, ?)";
+		return consulta(sql, [reg.IDPESSOA, reg.NOMUSUARIO, reg.CPFCNPJ, reg.EMAIL, reg.SENHA, reg.CUPOM, reg.TELEFONE, (reg.SITARQ == false || reg.SITPESSOA == false ? 'I' : 'A')], 'Erro Portal createArquiteto!')
     }
 
-    updateArquiteto(reg, pSituacao) {
+	updateArquiteto(reg) {
 		var sql = "update arquitetos set nome = ?, cpfcnpj = ?, email = ?, nr_cupom = ?, telefone = ?, indSituacao = ? where idPessoa = ?";
-		return consulta(sql, [reg.NOMUSUARIO, reg.CPFCNPJ, reg.EMAIL, reg.CUPOM, reg.TELEFONE, pSituacao, reg.IDPESSOA], 'Erro Portal updateArquiteto!')
+		return consulta(sql, [reg.NOMUSUARIO, reg.CPFCNPJ, reg.EMAIL, reg.CUPOM, reg.TELEFONE, (reg.SITARQ == false || reg.SITPESSOA == false ? 'I' : 'A'), reg.IDPESSOA], 'Erro Portal updateArquiteto!')
     }
 
-    createExtrato(reg) {
-        var sql = "insert into extrato (idproposta, codusuario, numproposta, nomcliente, valor, pontos, loja, datacompra) values (?, (SELECT idArquiteto from arquitetos where idPessoa = ?), ?, ?, ?, ?, ?, ?)";
-        return consulta(sql, [reg.IDPROPOSTA, reg.IDPESSOA, reg.PROPOSTA, reg.CLIENTE, reg.VALOR, parseInt(reg.VALOR), reg.EQUIPE, reg.EMISSAO], 'Não Incluir o extrato!')
-    }
+	createExtrato(reg) {
+		var sql = "insert into extrato (idproposta, codusuario, numproposta, nomcliente, valor, pontos, loja, datacompra) values (?, (SELECT idArquiteto from arquitetos where idPessoa = ?), ?, ?, ?, ?, ?, ?)";
+		return consulta(sql, [reg.IDPROPOSTA, reg.IDPESSOA, reg.PROPOSTA, reg.CLIENTE, reg.VALOR, parseInt(reg.VALOR), reg.EQUIPE, reg.EMISSAO], 'Não Incluir o extrato!')
+	}
 
-    createPremios(reg) {
-        var sql = "insert into premios (idfluig, indtipo, titulo, dataInicio, datafinal, texto, pontos, status) values (?, ?, ?, ?, ?, ?)";
-        return consulta(sql, [reg.ID, (reg.RESGATE == true ? 'R' : 'A'), reg.TITULO, reg.DATAINIRESGATE, reg.DATAFIMRESGATE, reg.TEXTO, parseInt(reg.PONTOS), 'A'], 'Não Incluir o Premio!')
-    }
+	createPremios(reg) {
+		var sql = "insert into premios (idfluig, indtipo, titulo, dataInicio, datafinal, texto, pontos, status) values (?, ?, ?, ?, ?, ?, ?, ?)";
+		return consulta(sql, [reg.ID, (reg.RESGATE == true ? 'R' : 'A'), reg.TITULO, reg.DATAINIRESGATE, reg.DATAFIMRESGATE, reg.TEXTO, parseInt(reg.PONTOS), 'A'], 'Não Incluir o Premio!')
+	}
+
+	updatePremios(reg) {
+		var sql = "update premios  set titulo = ?, dataInicio = ?, datafinal = ?, texto = ?, pontos = ? where idfluig = ?";
+		return consulta(sql, [reg.TITULO, reg.DATAINIRESGATE, reg.DATAFIMRESGATE, reg.TEXTO, parseInt(reg.PONTOS), reg.ID], 'Não Atualizar os Premio!')
+	}
+
+	deletePremiosFotos(reg) {
+		var sql = "delete from premios_fotos where idpremio = (select id from premios where idfluig = ?)";
+		return consulta(sql, [reg.ID], 'Não excluir as fotos dos Premio!')
+	}
 
 	createPremiosFotos(idpremio, reg) {
 		var sql = "insert into premios_fotos (idpremio, idfluig, foto) values (?, ?, ?)";

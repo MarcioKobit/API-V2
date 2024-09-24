@@ -294,8 +294,7 @@ class PortalController {
 
             } catch (error) {
                 // console.log(error)
-                var wIndSituacao = corpo.DATA[i].SITARQ == false || corpo.DATA[i].SITPESSOA == false ? false : true;
-                await PortalRepository.updateArquiteto(corpo.DATA[i], wIndSituacao).then((resposta) => {
+				await PortalRepository.updateArquiteto(corpo.DATA[i]).then((resposta) => {
 
 
                     var data = {
@@ -418,7 +417,7 @@ class PortalController {
 
 						var data = {
 							IDINT: resposta.insertId,
-							IDPROPOSTA: corpo.DATA[i].IDPROPOSTA,
+							IDFLUIG: corpo.DATA[i].ID,
 							ACAO: 'INS'
 						}
 
@@ -431,7 +430,22 @@ class PortalController {
 				});
 
 			} catch (error) {
-				console.log(error)
+				// console.log(error)
+				await PortalRepository.updatePremios(corpo.DATA[i]).then((resposta) => {
+					if (resposta.insertId > 0) {
+
+						var data = {
+							IDINT: null,
+							IDFLUIG: corpo.DATA[i].ID,
+							ACAO: 'UPD'
+						}
+						wArrayData.push(data);
+
+						// for (var x = 0; x < corpo.DATA[i].FOTOS.length; x++) {
+						// 	PortalRepository.createPremiosFotos(corpo.DATA[i].ID, corpo.DATA[i].FOTOS[x]);
+						// }
+					}
+				});
 			}
 		}
 

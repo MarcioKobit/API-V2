@@ -119,9 +119,9 @@ class InstalacoesController {
 
         // console.log(req.query.proposta);
         // ####### Validacao do JWT #######
-        // var wOjJWT = jwtController.validarJWT(req, res);
-        // if (!wOjJWT[0]) { return false; };
-        // const { codempresa, id } = wOjJWT[1]
+		var wOjJWT = jwtController.validarJWT(req, res);
+		if (!wOjJWT[0]) { return false; };
+		const { codempresa, id } = wOjJWT[1]
         // ####### Validacao do JWT #######
 
         const { idproposta, seqinstall, fotos, servico } = req.query;
@@ -257,8 +257,7 @@ class InstalacoesController {
                         wArrayData.push(data)
                     });
 
-                } catch (error) {
-                    // console.log('Cacth instalacao')
+				} catch (error) {
                     await InstalacoesRepository.updateInstalacaoAgenda(corpo[i])
                     await InstalacoesRepository.removeServicoPendente(corpo[i]);
                     await InstalacoesRepository.removeServicoFotoPendente(corpo[i]);
@@ -277,16 +276,13 @@ class InstalacoesController {
                         ACAO: 'UPD'
                     }
 
-                    wArrayData.push(data)
-
-
+					wArrayData.push(data);
                 }
 
             }
 
             if (corpo[i].INDACAO == 'D') {
 
-                // console.log(corpo[i])
                 await InstalacoesRepository.removeServicoFotoGeral(corpo[i]);
                 await InstalacoesRepository.removeServicoGeral(corpo[i]);
                 await InstalacoesRepository.removeInstalacaoGeral(corpo[i]);
@@ -324,7 +320,9 @@ class InstalacoesController {
         // ####### Validacao do JWT #######
 
         const corpo = req.body;
-        var wArray = [];
+		var wArray = [];
+
+		console.log(corpo);
 
 
         var length = Object.keys(corpo).length;
@@ -341,8 +339,7 @@ class InstalacoesController {
                 case "D":
                     InstalacoesRepository.removeServicoFoto(corpo[i]);
                     break;
-            }
-
+			}
         }
 
         wArray.push({
@@ -363,7 +360,14 @@ class InstalacoesController {
         // ####### Validacao do JWT #######
 
         const corpo = req.body;
-        var wArray = [];
+		var wArray = {};
+
+		// console.log(corpo)
+
+		// res.json(wArray);
+		// res.end();
+
+		// return
 
         var length = Object.keys(corpo).length;
         var wArrayData = []
@@ -376,14 +380,17 @@ class InstalacoesController {
                 case "S":
                     InstalacoesRepository.updateInstalacaoServico(corpo[i]);
                     break;
+				case "F":
+					InstalacoesRepository.createFotoTMP(corpo[i].FOTO);
+					break;
             }
         }
 
-        wArray.push({
+		wArray = {
             STATUS: true,
             RECORDS: length,
             DATA: wArrayData
-        });
+		};
 
 		res.json(wArray);
 		res.end();
