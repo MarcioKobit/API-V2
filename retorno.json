@@ -1,7 +1,12 @@
-[
-	{
-		"IDINSTALACAO": 8119,
-		"INDACAO": "I",
-		"STATUS": "E"
-	}
-]
+{
+	"_invoke": [Function anonymous
+	],
+	"changes": 1,
+	"getAllAsync": [Function bound getAllAsync
+	],
+	"getFirstAsync": [Function bound getFirstAsync
+	],
+	"lastInsertRowId": 8119,
+	"resetAsync": [Function bound resetAsync
+	]
+}

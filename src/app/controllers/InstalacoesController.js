@@ -1,7 +1,8 @@
 // import { Console } from 'console';
 import InstalacoesRepository from '../repositories/InstalacoesRepository.js';
 import jwtController from './jwtController.js';
-import auxiliares from '../components/auxiliares.js';
+import image from '../components/image.js';
+import AUXController from './AuxiliaresController.js';
 import UsuarioRepository from '../repositories/UsuarioRepository.js';
 
 
@@ -21,6 +22,17 @@ class InstalacoesController {
         if (length > 0) {
             var wArrayData = [];
             for (var i = 0; i < length; i++) {
+
+				var wArrayAceite = {};
+				const rowAceite = await InstalacoesRepository.findAceiteAll(row[i].idInstalacao);
+				var lengthAceite = Object.keys(rowAceite).length;
+				if (lengthAceite > 0) {
+					wArrayAceite = {
+						ID: rowAceite[0].numDocumento,
+						URL: rowAceite[0].urlDocumento
+					}
+				}
+
                 var wArrayServ = {};
                 const rowServ = await InstalacoesRepository.findServicoAll(id, row[i].idInstalacao)
                 var lengthServ = Object.keys(rowServ).length;
@@ -43,7 +55,7 @@ class InstalacoesController {
                             }
                             wArrayServFoto = {
                                 STATUS: true,
-                                RECORDS: lengthServ,
+								RECORDS: lengthServFoto,
                                 DATA: wArrayDataServFoto
                             };
                         } else {
@@ -92,6 +104,7 @@ class InstalacoesController {
                     LATITUDE: row[i].latitudeO,
                     LONGITUDE: row[i].longitudeO,
                     SITUACAO: row[i].indSituacao,
+					DOCUMENTO: wArrayAceite,
                     SERVICOS: wArrayServ
                 }
                 wArrayData.push(data)
@@ -117,14 +130,23 @@ class InstalacoesController {
 
     async listarInstalacoes(req, res) {
 
-        // console.log(req.query.proposta);
-        // ####### Validacao do JWT #######
-		var wOjJWT = jwtController.validarJWT(req, res);
-		if (!wOjJWT[0]) { return false; };
-		const { codempresa, id } = wOjJWT[1]
-        // ####### Validacao do JWT #######
+		const jwt = req.headers["authorization"] || req.headers["x-access-token"];
+		const objAPI = await UsuarioRepository.validaToken(jwt);
 
-        const { idproposta, seqinstall, fotos, servico } = req.query;
+		if (objAPI.length == 0) {
+			var wArray = {
+				STATUS: false,
+				RECORDS: 1,
+				DATA: [{
+					MENSAGEM: 'Token Inválido'
+				}]
+			};
+			res.json(wArray);
+			res.end();
+			return false;
+		}
+
+		const { idproposta, seqinstall, fotos, servico, aceite } = req.query;
 
         var wArray = [];
         wArray.push({
@@ -136,11 +158,26 @@ class InstalacoesController {
         if (idproposta != undefined && idproposta != '') {
 
             const objInstalacao = await InstalacoesRepository.findByID(idproposta, seqinstall)
-            // var length = Object.keys(objInstalacao).length;
-            // if (length > 0) {
+			// console.log(objInstalacao);
             var wArrayData = [];
             for (var i = 0; i < objInstalacao.length; i++) {
-                var wArrayDataServ = [];
+				var wArrayDataServ = [];
+				var wArrayDataAceite = {};
+
+				var objAceite = await InstalacoesRepository.findAceiteById(objInstalacao[i].idInstalacao, aceite);
+				if (objAceite.length > 0) {
+					var wArrayDataAceite = {
+						DOCUMENTO: objAceite[0].numDocumento,
+						DATACEITE: objAceite[0].datAceite,
+						ACEITE: objAceite[0].aceite,
+						OBSERVACAO: objAceite[0].observacao,
+						LATITUDE: objAceite[0].latitude,
+						LONGITUDE: objAceite[0].longitude,
+						SITUACAO: objAceite[0].indSituacao,
+						FOTO: aceite == undefined || aceite == '' ? null : objAceite[0].foto
+					}
+				}
+
                 if (servico == undefined || servico == '') {
                     var objServ = await InstalacoesRepository.findServicoByID(objInstalacao[i].idInstalacao);
                 } else {
@@ -179,8 +216,14 @@ class InstalacoesController {
                 var data = {
                     ID: objInstalacao[i].idInstalacao,
                     PROPOSTA: objInstalacao[i].idProposta,
-                    ORDERID: objInstalacao[i].orderid,
-                    INDSITUACAO: objInstalacao[i].indsituacao,
+					ORDERID: objInstalacao[i].orderid,
+					AGENDAINI: objInstalacao[i].datAgendado != null ? objInstalacao[i].datAgendado.split('T')[0] : '',
+					AGENDAFIM: objInstalacao[i].datAgendadoFim != null ? objInstalacao[i].datAgendadoFim.split('T')[0] : '',
+					LATITUDE: objInstalacao[i].latitudeR,
+					LONGITUDE: objInstalacao[i].longitudeR,
+					OBSERVACAO: objInstalacao[i].observacao,
+					INDSITUACAO: objInstalacao[i].indsituacao,
+					ACEITE: wArrayDataAceite,
                     SERVICOS: wArrayDataServ
                 }
                 wArrayData.push(data);
@@ -207,8 +250,7 @@ class InstalacoesController {
 
     async storeInstalacoes(req, res) {
 
-        const jwt = req.headers["authorization"] || req.headers["x-access-token"];
-        // console.log(jwt)
+		const jwt = req.headers["authorization"] || req.headers["x-access-token"];
         const objAPI = await UsuarioRepository.validaToken(jwt);
 
         if (objAPI.length == 0) {
@@ -235,16 +277,23 @@ class InstalacoesController {
             if (corpo[i].INDACAO == undefined || corpo[i].INDACAO == 'A') {
 
                 try {
-                    await InstalacoesRepository.create(corpo[i]).then((resposta) => {
-                        if (resposta.insertId > 0) {
-                            // var lengthServ = Object.keys(corpo[i].SERVICOS).length;
-                            for (var x = 0; x < corpo[i].SERVICOS.length; x++) {
-                                try {
-                                    InstalacoesRepository.createinstalacoesServico(corpo[i], corpo[i].SERVICOS[x])
-                                } catch (error) {
-                                    // console.log('Cacth createinstalacoesServico');
-                                }
-                            }
+					await InstalacoesRepository.create(corpo[i]).then((resposta) => {
+						if (resposta.insertId > 0) {
+							try {
+								if (corpo[i].DOCUMENTO != undefined) {
+									InstalacoesRepository.createinstalacoesAceite(corpo[i]);
+								}
+							} catch (error) {
+								console.log(error)
+							}
+
+							for (var x = 0; x < corpo[i].SERVICOS.length; x++) {
+								try {
+									InstalacoesRepository.createinstalacoesServico(corpo[i], corpo[i].SERVICOS[x])
+								} catch (error) {
+									// console.log('Cacth createinstalacoesServico');
+								}
+							}
                         }
 
                         var data = {
@@ -255,7 +304,7 @@ class InstalacoesController {
                         }
 
                         wArrayData.push(data)
-                    });
+					});
 
 				} catch (error) {
                     await InstalacoesRepository.updateInstalacaoAgenda(corpo[i])
@@ -313,6 +362,7 @@ class InstalacoesController {
     }
 
     async storeInstalacaoFoto(req, res) {
+		// console.log('storeInstalacaoFoto');
         // ####### Validacao do JWT #######
         var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
@@ -320,33 +370,53 @@ class InstalacoesController {
         // ####### Validacao do JWT #######
 
         const corpo = req.body;
-		var wArray = [];
+		var wArray = {};
 
-		console.log(corpo);
-
+		// console.log(corpo)
 
         var length = Object.keys(corpo).length;
-
-        // console.log("R: " + length)
-        var wArrayData = []
+		var wArrayData = [];
         for (var i = 0; i < length; i++) {
+			// console.log(corpo[i])
 
-            switch (corpo[i].INDSYNC) {
-                case "S":
-                    corpo[i].FOTO = await auxiliares.resizeBase64({ base64Image: corpo[i].FOTO, maxWidth: 800 });
-                    InstalacoesRepository.createinstalacoesServicoFoto(corpo[i]);
-                    break;
-                case "D":
-                    InstalacoesRepository.removeServicoFoto(corpo[i]);
-                    break;
-			}
+			wArrayData.push(await processaServFotos(corpo[i]));
+			// try {
+			// 	switch (corpo[i].INDACAO) {
+			// 		case "I":
+			// 			corpo[i].FOTO = await AUXController.resizeBase64({ base64Image: corpo[i].FOTO, maxWidth: 800 });
+			// 			const reg = await InstalacoesRepository.createinstalacoesServicoFoto(corpo[i]);
+			// 			var data = {
+			// 				ID: corpo[i].ID,
+			// 				IDAPI: reg.insertId,
+			// 				ACAO: 'INS'
+			// 			}
+			// 			wArrayData.push(data);
+			// 			break;
+			// 		case "D":
+			// 			await InstalacoesRepository.removeServicoFoto(corpo[i]);
+			// 			var data = {
+			// 				ID: corpo[i].ID,
+			// 				IDAPI: null,
+			// 				ACAO: 'DEL'
+			// 			}
+			// 			wArrayData.push(data);
+			// 			break;
+			// 	}
+			// } catch (error) {
+			// 	var data = {
+			// 		ID: corpo[i].ID,
+			// 		IDAPI: null,
+			// 		ACAO: 'ERROR'
+			// 	}
+			// 	wArrayData.push(data);
+			// }
         }
 
-        wArray.push({
+		wArray = {
             STATUS: true,
             RECORDS: length,
             DATA: wArrayData
-        });
+		};
 
 		res.json(wArray);
 		res.end();
@@ -362,11 +432,26 @@ class InstalacoesController {
         const corpo = req.body;
 		var wArray = {};
 
-		// console.log(corpo)
+
+		const row = await InstalacoesRepository.findLogByID('updateInstalacao');
+		var length = Object.keys(row).length;
+		if (length > 0) {
+			if (row[0].indLog == 'S') {
+				var data = {
+					codUsuario: id,
+					endPoint: 'updateInstalacao',
+					json: JSON.stringify(corpo)
+				}
+
+				await InstalacoesRepository.createlog(data);
+			}
+		}
+
+		// console.log('Atualizando')
+		// console.log(JSON.stringify(corpo))
 
 		// res.json(wArray);
 		// res.end();
-
 		// return
 
         var length = Object.keys(corpo).length;
@@ -375,13 +460,16 @@ class InstalacoesController {
 
             switch (corpo[i].INDACAO) {
                 case "I":
-                    InstalacoesRepository.updateInstalacao(corpo[i]);
+					wArrayData.push(await processaInstalacao(corpo[i]));
                     break;
                 case "S":
-                    InstalacoesRepository.updateInstalacaoServico(corpo[i]);
+					wArrayData.push(await processaServ(corpo[i]));
                     break;
 				case "F":
-					InstalacoesRepository.createFotoTMP(corpo[i].FOTO);
+					wArrayData.push(await processaServFotos(corpo[i]));
+					break;
+				case "A":
+					wArrayData.push(await processaInstalacaoAceite(corpo[i]));
 					break;
             }
         }
@@ -396,6 +484,158 @@ class InstalacoesController {
 		res.end();
     }
 
+}
+
+
+async function processaInstalacao(reg) {
+	try {
+		var wArray = {};
+		var wArrayDataServices = [];
+		var wArrayDataAceite = [];
+
+		// console.log(reg)
+
+		await InstalacoesRepository.updateInstalacao(reg);
+		for (var i = 0; i < reg.SERVICOS.length; i++) {
+			wArrayDataServices.push(await processaServ(reg.SERVICOS[i]));
+		}
+
+		for (var i = 0; i < reg.ACEITE.length; i++) {
+			wArrayDataAceite.push(await processaInstalacaoAceite(reg.ACEITE[i]));
+		}
+
+		wArray = {
+			INDACAO: 'I',
+			ACAO: 'UPD',
+			IDINSTALACAO: reg.IDINSTALACAO,
+			STATUS: reg.STATUS,
+			SERVICOS: wArrayDataServices,
+			ACEITE: wArrayDataAceite
+		}
+
+	} catch (error) {
+		wArray = {
+			INDACAO: 'I',
+			ACAO: 'ERROR',
+			IDINSTALACAO: reg.IDINSTALACAO,
+			STATUS: reg.STATUS,
+			SERVICOS: wArrayDataServices,
+			ACEITE: wArrayDataAceite
+		}
+
+	} finally {
+		// console.log(wArray)
+		return wArray;
+	}
+}
+
+async function processaInstalacaoAceite(reg) {
+	try {
+		var wArray = {};
+		var wArrayDataAceite = [];
+		// console.log(reg);
+
+
+		reg.FOTO = reg.FOTO != '' ? await image.resizeBase64({ base64Image: reg.FOTO, maxWidth: 800 }) : null;
+		await InstalacoesRepository.updateInstalacaoAceite(reg);
+		var data = {
+			IDINSTALACAO: reg.IDINSTALACAO
+		}
+
+		wArrayDataAceite.push(data);
+
+
+		wArray = {
+			INDACAO: 'A',
+			ACAO: 'UPD',
+			INSTALACAO: wArrayDataAceite
+
+		}
+
+	} catch (error) {
+		wArray = {
+			INDACAO: 'A',
+			ACAO: 'ERROR',
+			INSTALACAO: wArrayDataAceite,
+			MENSAGEM: error.toString()
+		}
+	} finally {
+		return wArray;
+	}
+}
+
+async function processaServ(reg) {
+	try {
+		var wArray = {};
+		var wArrayDataFotos = [];
+
+		// console.log(reg)
+		await InstalacoesRepository.updateInstalacaoServico(reg);
+
+		for (var x = 0; x < reg.FOTOS.length; x++) {
+			// console.log(reg.FOTOS[x])
+			wArrayDataFotos.push(await processaServFotos(reg.FOTOS[x]));
+		}
+
+		wArray = {
+			INDACAO: 'S',
+			ACAO: 'UPD',
+			IDINSTALACAO: reg.IDINSTALACAO,
+			IDSERVICO: reg.IDSERVICO,
+			FOTOS: wArrayDataFotos
+		}
+
+	} catch (error) {
+		console.log('Serv: ' + error)
+		wArray = {
+			INDACAO: 'S',
+			ACAO: 'ERROR',
+			IDINSTALACAO: reg.IDINSTALACAO,
+			IDSERVICO: reg.IDSERVICO,
+			FOTOS: wArrayDataFotos
+		}
+
+	} finally {
+		return wArray;
+	}
+}
+
+async function processaServFotos(reg) {
+	try {
+		var wArray = {};
+
+		switch (reg.ACAO) {
+			case "I":
+				reg.FOTO = reg.FOTO != '' ? await image.resizeBase64({ base64Image: reg.FOTO, maxWidth: 800 }) : '';
+				const row = await InstalacoesRepository.createinstalacoesServicoFoto(reg);
+				wArray = {
+					INDACAO: 'F',
+					ID: reg.ID,
+					IDAPI: row != null ? row.insertId : null,
+					ACAO: 'INS'
+				}
+				break;
+			case "D":
+				await InstalacoesRepository.removeServicoFoto(reg);
+				wArray = {
+					INDACAO: 'F',
+					ID: reg.ID,
+					IDAPI: null,
+					ACAO: 'DEL'
+				}
+				break;
+		}
+	} catch (error) {
+		console.log('Foto: ' + error)
+		wArray = {
+			ID: reg.ID,
+			IDAPI: null,
+			ACAO: 'ERROR'
+		}
+
+	} finally {
+		return wArray;
+	}
 }
 
 export default new InstalacoesController()

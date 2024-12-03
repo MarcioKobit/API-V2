@@ -2,7 +2,6 @@
 import PortalRepository from '../repositories/PortalRepository.js';
 import UsuarioRepository from '../repositories/UsuarioRepository.js';
 import jwtController from './jwtController.js';
-import auxiliares from '../components/auxiliares.js';
 import AuxiliaresController from './AuxiliaresController.js';
 
 
@@ -294,19 +293,19 @@ class PortalController {
 
             } catch (error) {
                 // console.log(error)
-				await PortalRepository.updateArquiteto(corpo.DATA[i]).then((resposta) => {
+				try {
+					await PortalRepository.updateArquiteto(corpo.DATA[i]).then((resposta) => {
+						var data = {
+							IDINT: null,
+							IDPESSOA: corpo.DATA[i].IDPESSOA,
+							ACAO: 'UPD'
+						}
 
+						wArrayData.push(data);
 
-                    var data = {
-                        IDINT: null,
-                        IDPESSOA: corpo.DATA[i].IDPESSOA,
-                        ACAO: 'UPD'
-                    }
-
-                    wArrayData.push(data);
-
-                });
-
+					});
+				} catch (error) {
+				}
             }
         }
 

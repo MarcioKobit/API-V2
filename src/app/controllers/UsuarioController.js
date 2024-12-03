@@ -241,13 +241,23 @@ class UsuarioController {
                     }
                 }
             }
-        }
+		}
 
-        wArray = {
-            STATUS: dadosUsuario.status != undefined ? true : false,
-            RECORDS: dadosUsuario.status != undefined ? 1 : 0,
-            DATA: dadosUsuario.status != undefined ? dadosUsuario : []
-        };
+		try {
+			wArray = {
+				STATUS: dadosUsuario.status != undefined ? true : false,
+				RECORDS: dadosUsuario.status != undefined ? 1 : 0,
+				DATA: dadosUsuario.status != undefined ? dadosUsuario : []
+			};
+		} catch (error) {
+			wArray = {
+				STATUS: false,
+				RECORDS: 0,
+				DATA: []
+			};
+		}
+
+
 
         res.json(wArray);
 		res.end();

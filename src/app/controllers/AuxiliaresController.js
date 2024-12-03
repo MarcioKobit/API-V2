@@ -68,7 +68,7 @@ class AUXController {
             console.log(error)
             return [false, null];
         }
-    }
+	}
 }
 
 export default new AUXController()

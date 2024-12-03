@@ -44,7 +44,7 @@ class PortalRepository {
 	}
 
     findAll() {
-        var sql = "select id, indtipo, titulo, texto, pontos, DATE_FORMAT(datainicio, '%d/%m/%Y' ) as datainicio, DATE_FORMAT(datafinal, '%d/%m/%Y' ) as datafinal from premios where status = 'A'";
+		var sql = "select id, indtipo, titulo, texto, pontos, DATE_FORMAT(datainicio, '%d/%m/%Y' ) as datainicio, DATE_FORMAT(datafinal, '%d/%m/%Y' ) as datafinal from premios where status = 'A' order by pontos";
         return consulta(sql, 'Erro Portal findAll!')
     }
 

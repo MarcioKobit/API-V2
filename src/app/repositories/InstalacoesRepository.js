@@ -5,9 +5,14 @@ class InstalacoesRepository {
     // CRUD
     create(reg) {
         var sql = "insert into instalacoes (datregistro, idproposta, orderid, seqInstall, nomcliente, numtelefone, nomendereco, nombairro, numcep, nomcidade, uf, codusuario, datatribuido, datagendado, datAgendadoFim, indsituacao) values ";
-        sql += "(current_date(),?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (select codusuario from usuarios where login = ?), ?, ?, ?, 'P') ";
-        return consulta(sql, [reg.PROPOSTA, reg.IDPROPOSTA, reg.SEQINSTALL, reg.CLIENTE, reg.NUMTELEFONE, reg.ENDERECO, reg.BAIRRO, reg.CEP, reg.CIDADE, reg.UF, reg.INSTALADOR, reg.DATATRIBUIDO, reg.DATAGENDA, reg.DATAGENDAFIM], 'Erro Instalador create!')
-    }
+		sql += "(current_date(),?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (select codusuario from usuarios where login = ?), ?, ?, ?, ?) ";
+		return consulta(sql, [reg.PROPOSTA, reg.IDPROPOSTA, reg.SEQINSTALL, reg.CLIENTE, reg.NUMTELEFONE, reg.ENDERECO, reg.BAIRRO, reg.CEP, reg.CIDADE, reg.UF, reg.INSTALADOR, reg.DATATRIBUIDO, reg.DATAGENDA, reg.DATAGENDAFIM, reg.DATAGENDA == 'null' ? 'A' : 'P'], 'Erro Instalador create!')
+	}
+
+	createinstalacoesAceite(reg) {
+		var sql = "insert into instalacaoAceite (idinstalacao, numDocumento, urlDocumento, indsituacao) values ((select idinstalacao from instalacoes where orderid = ? and seqInstall = ?), ?, ?, 'P') ";
+		return consulta(sql, [reg.IDPROPOSTA, reg.SEQINSTALL, reg.DOCUMENTO.ID, reg.DOCUMENTO.URLDOCUMENTO], 'Error ao cadastrar instalacaoAceite!')
+	}
 
     createinstalacoesServico(reg, regitem) {
         var sql = "insert into instalacaoServico (idinstalacao, idseq, descricao, indsituacao) values ((select idinstalacao from instalacoes where orderid = ? and seqInstall = ?), ?, ?, 'P') ";
@@ -26,7 +31,7 @@ class InstalacoesRepository {
 
     removeServicoFoto(reg) {
         var sql = "delete from instalacaoServicoFoto where idInstalacao = ? and idServico = ? and id = ?";
-        return consulta(sql, [reg.IDINSTALACAO, reg.IDSERVICO, reg.ID], 'Erro ao delete instalacaoServicoFoto!')
+		return consulta(sql, [reg.IDINSTALACAO, reg.IDSERVICO, reg.IDAPI], 'Erro ao delete instalacaoServicoFoto!')
     }
 
     removeServicoPendente(reg) {
@@ -56,21 +61,36 @@ class InstalacoesRepository {
         return consulta(sql, [reg.IDPROPOSTA, reg.SEQINSTALL], 'Erro deleter instalacao Geral!')
     }
 
-
     updateInstalacaoAgenda(reg) {
         var sql = "update instalacoes set datagendado = ?, datAgendadoFim = ?  where orderid = ? and seqInstall = ?";
         return consulta(sql, [reg.DATAGENDA, reg.DATAGENDAFIM, reg.IDPROPOSTA, reg.SEQINSTALL], 'Não foi possível atualizar instalacao!')
     }
 
-    updateInstalacao(reg) {
-		var sql = "update instalacoes set indSituacao = ?, latitudeR = ?, longitudeR = ?, observacao = ? where idInstalacao = ?";
-		return consulta(sql, [reg.STATUS, reg.LATITUDE, reg.LONGITUDE, reg.IDSEROBSVICO, reg.IDINSTALACAO], 'Não foi possível atualizar instalacao 2!')
-    }
+	updateInstalacao(reg) {
+		var sql = "update instalacoes set datagendado = ?, datAgendadoFim = ?, indSituacao = ?, latitudeR = ?, longitudeR = ?, observacao = ? where idInstalacao = ?";
+		return consulta(sql, [reg.DATAAGENDAINI, reg.DATAAGENDAFIM, reg.STATUS, reg.LATITUDE, reg.LONGITUDE, reg.OBS, reg.IDINSTALACAO], 'Não foi possível atualizar instalacao 2!')
+	}
+
+	updateInstalacaoAceite(reg) {
+		var sql = "update instalacaoAceite set datAceite = ?, aceite = ?, foto = ?, latitude = ?, longitude = ?, observacao = ?, indsituacao = ? where idInstalacao = ?";
+		return consulta(sql, [reg.DATA, reg.ACEITE, reg.FOTO, reg.LATITUDE, reg.LONGITUDE, reg.OBS, reg.STATUS, reg.IDINSTALACAO], 'Não foi possível atualizar Aceite!')
+	}
 
     updateInstalacaoServico(reg) {
         var sql = "update instalacaoServico set indSituacao = ?  where id = ? and  idInstalacao = ?";
-		return consulta(sql, [reg.STATUS, reg.IDSERVICO, reg.IDINSTALACAO], 'Não foi possível atualizar servico!')
-    }
+		return consulta(sql, [reg.SITUACAO, reg.IDSERVICO, reg.IDINSTALACAO], 'Não foi possível atualizar servico!')
+	}
+
+	findLogByID(endpoint) {
+		var sql = "";
+		sql += "select indLog from log_endpoint where endpoint = ? ";
+		return consulta(sql, [endpoint], 'Erro findLogByID!')
+	}
+
+	createlog(reg) {
+		var sql = "insert into log_endpoint_data (endpoint, datregistro, codUsuario, json) values (?, current_timestamp(), ?, ?) ";
+		return consulta(sql, [reg.endPoint, reg.codUsuario, reg.json], 'Error createlog!')
+	}
 
     findAll(pCodUsuario) {
 
@@ -93,7 +113,7 @@ class InstalacoesRepository {
         sql += "indSituacao ";
         sql += "from instalacoes ";
         sql += "where codUsuario = ? ";
-		sql += "  and indSituacao in ('P','E')";
+		sql += "  and indSituacao in ('P','E','A')";
 
         return consulta(sql, [pCodUsuario], 'Erro Instalador findAll!')
     }
@@ -104,28 +124,48 @@ class InstalacoesRepository {
         sql += "select ";
         sql += "idInstalacao, "
         sql += "idProposta, ";
-        sql += "orderid, ";
-        sql += "indsituacao ";
+		sql += "orderid, ";
+		sql += "datAgendado, ";
+		sql += "datAgendadoFim, ";
+		sql += "observacao, ";
+		sql += "latitudeR, ";
+		sql += "longitudeR, ";
+		sql += "indsituacao ";
         sql += "from instalacoes ";
         sql += "where orderid = ?"
         sql += "  and seqInstall = ?"
 
         return consulta(sql, [idProposta, seqProposta], 'Erro Instalador findByID!')
-    }
+	}
 
-    findServicoAll(pCodUsuario, pCodInstalacao) {
-        var sql = "";
-        sql += "select ";
-        sql += "InsS.* ";
-        sql += "from instalacaoServico InsS ";
-        sql += "    inner join instalacoes i on (i.idInstalacao = InsS.idInstalacao) ";
-		sql += "                            and i.indSituacao in ('P','E')  ";
-        sql += "where i.codUsuario = ?";
-        sql += " and i.idInstalacao = ?";
-        sql += " and InsS.indSituacao = 'P'";
+	findAceiteAll(pCodInstalacao) {
+		var sql = "";
+		sql += "select numDocumento, urlDocumento from instalacaoAceite where idInstalacao = ? ";
+		return consulta(sql, [pCodInstalacao], 'Erro Instalador findAceiteAll!')
+	}
 
-        return consulta(sql, [pCodUsuario, pCodInstalacao], 'Erro Instalador findServicoAll!')
-    }
+	findServicoAll(pCodUsuario, pCodInstalacao) {
+		var sql = "";
+		sql += "select ";
+		sql += "InsS.* ";
+		sql += "from instalacaoServico InsS ";
+		sql += "    inner join instalacoes i on (i.idInstalacao = InsS.idInstalacao) ";
+		sql += "                            and i.indSituacao in ('P','E','A')  ";
+		sql += "where i.codUsuario = ?";
+		sql += " and i.idInstalacao = ?";
+		sql += " and InsS.indSituacao = 'P'";
+
+		return consulta(sql, [pCodUsuario, pCodInstalacao], 'Erro Instalador findServicoAll!')
+	}
+
+	findAceiteById(pCodInstalacao, aceite) {
+		var wComple = '';
+		if (aceite != undefined && aceite != '') {
+			wComple = ', convert(foto using utf8) as foto';
+		}
+		var sql = `select numDocumento, datAceite, aceite ${wComple}, latitude, longitude, observacao, indSituacao from instalacaoAceite where idInstalacao = ?`;
+		return consulta(sql, [pCodInstalacao], 'Erro findAceiteById!');
+	}
 
     findServicoByID(idInstalacao) {
         var sql = "select id, idInstalacao, idseq, descricao, indsituacao from instalacaoServico where idInstalacao = ?";

@@ -17,7 +17,9 @@ router.get('/cep', UsuarioController.cep)
 
 
 var wEndpoints = await EndPointController.listar();
+// console.log(wEndpoints)
 for (var i = 0; i < wEndpoints[0].RECORDS; i++) {
+	// console.log(wEndpoints[0].DATA[i])
     switch (wEndpoints[0].DATA[i].method) {
         case "GET":
             router.get(wEndpoints[0].DATA[i].rota + wEndpoints[0].DATA[i].endpoint, eval(wEndpoints[0].DATA[i].endfunction));

