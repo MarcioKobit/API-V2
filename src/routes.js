@@ -14,6 +14,8 @@ const router = Router()
 router.get('/', UsuarioController.home)
 router.post('/login', UsuarioController.login)
 router.get('/cep', UsuarioController.cep)
+router.get('/loginstaladores', InstalacoesController.logInstaladores)
+
 
 
 var wEndpoints = await EndPointController.listar();

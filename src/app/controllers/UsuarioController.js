@@ -163,7 +163,9 @@ class UsuarioController {
         var wArray = {};
 		var wOjJWT = jwtController.validarJWT(req, res);
         if (!wOjJWT[0]) { return false; };
-        const { codempresa, id } = wOjJWT[1];
+		const { codempresa, id } = wOjJWT[1];
+
+		console.log('passwordChange')
 
         if (corpo.EFETIVAR == undefined || corpo.EFETIVAR == '') {
 			var wOjSenha = jwtController.encryptPass(corpo.SENHA);
@@ -261,7 +263,7 @@ class UsuarioController {
 
         res.json(wArray);
 		res.end();
-    }
+	}
 
     async updateAvatar(req, res) {
 

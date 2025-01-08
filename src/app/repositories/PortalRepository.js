@@ -28,6 +28,17 @@ class PortalRepository {
 		return consulta(sql, [reg.TITULO, reg.DATAINIRESGATE, reg.DATAFIMRESGATE, reg.TEXTO, parseInt(reg.PONTOS), reg.ID], 'Não Atualizar os Premio!')
 	}
 
+	cancelarUpdateArquitetoPendente(pIdArquiteto) {
+		var sql = "update arquitetosDados set indAplicado = 'C' where idArquiteto = ? and indAplicado = 'P'";
+		return consulta(sql, [pIdArquiteto], 'Não foi cancelarUpdateArquitetoPendente!')
+	}
+
+
+	updateArquiteto(pIdArquiteto, reg) {
+		var sql = "insert into arquitetosDados (idArquiteto, nome, cep, endereco, numero, uf, cidade, bairro, complemento, celular, indAplicado) values ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		return consulta(sql, [pIdArquiteto, reg.name, reg.zipCode, reg.street, reg.number, reg.state, reg.city, reg.neighbourhood, reg.complement, reg.mobileNumber, 'P'], 'Erro Portal updateArquiteto!')
+	}
+
 	deletePremiosFotos(reg) {
 		var sql = "delete from premios_fotos where idpremio = (select id from premios where idfluig = ?)";
 		return consulta(sql, [reg.ID], 'Não excluir as fotos dos Premio!')

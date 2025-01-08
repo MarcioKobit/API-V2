@@ -459,14 +459,14 @@ class PortalController {
 		res.end();
 	}
 
-	async updateArquietos(req, res) {
+	async updateArquitetos(req, res) {
 
 		// ####### Validacao do JWT #######
 		var wOjJWT = jwtController.validarJWT(req, res);
+
 		if (!wOjJWT[0]) { return false; };
 		const { codempresa, id } = wOjJWT[1]
 		// ####### Validacao do JWT #######
-
 
 		const corpo = req.body;
 		var wArray = {
@@ -475,35 +475,19 @@ class PortalController {
 			DATA: []
 		};
 
-		// return false;
 		var wArrayData = []
 		for (var i = 0; i < corpo.RECORDS; i++) {
 			try {
-				await PortalRepository.createPremios(corpo.DATA[i]).then((resposta) => {
-					if (resposta.insertId > 0) {
-
-						var data = {
-							IDINT: resposta.insertId,
-							IDPROPOSTA: corpo.DATA[i].IDPROPOSTA,
-							ACAO: 'INS'
-						}
-
-						wArrayData.push(data);
-
-						for (var x = 0; x < corpo.DATA[i].FOTOS.length; x++) {
-							PortalRepository.createPremiosFotos(resposta.insertId, corpo.DATA[i].FOTOS[x]);
-						}
-					}
-				});
-
+				await PortalRepository.cancelarUpdateArquitetoPendente(id);
+				await PortalRepository.updateArquiteto(id, corpo.DATA);
 			} catch (error) {
-				console.log(error)
+				// console.log(error)
 			}
 		}
 
 		wArray = {
 			STATUS: true,
-			RECORDS: wArrayData.length,
+			RECORDS: corpo.RECORDS,
 			DATA: wArrayData
 		};
 

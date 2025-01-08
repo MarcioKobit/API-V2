@@ -106,7 +106,7 @@ class UsuarioRepository {
     updateSenhaPortal(pIdUsuario, pSenha) {
         var sql = "update arquitetos set senha ? where id = ?";
         return consulta(sql, [pSenha, pIdUsuario], 'Não foi Atualizar senha Portal!')
-    }
+	}
 
     updateSenha(pCodempresa, pIdUsuario, pSenha) {
         var sql = "update usuarios set senha ? where idEmpresa = ? and codUsuario = ?";

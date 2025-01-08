@@ -113,7 +113,7 @@ class InstalacoesRepository {
         sql += "indSituacao ";
         sql += "from instalacoes ";
         sql += "where codUsuario = ? ";
-		sql += "  and indSituacao in ('P','E','A')";
+		sql += "  and indSituacao in ('P','E','A','K')";
 
         return consulta(sql, [pCodUsuario], 'Erro Instalador findAll!')
     }
@@ -136,6 +136,15 @@ class InstalacoesRepository {
         sql += "  and seqInstall = ?"
 
         return consulta(sql, [idProposta, seqProposta], 'Erro Instalador findByID!')
+	}
+
+	findLogByIdAll(pCodUsuario, pCodInstalacao) {
+		var sql = "";
+		if (pCodInstalacao != null && pCodInstalacao != '') {
+			sql = "  and  convert(JSON using utf8) like '%" + pCodInstalacao + "%' ";
+		}
+		sql += "select sequence, endpoint, datRegistro, convert(JSON using utf8) as json from log_endpoint_data where codUsuario = ? " + sql;
+		return consulta(sql, [pCodUsuario], 'Erro Instalador findAceiteAll!')
 	}
 
 	findAceiteAll(pCodInstalacao) {

@@ -19,7 +19,8 @@ class JWTController {
 	validarJWT(req, res) {
         const jwt = req.headers["authorization"] || req.headers["x-access-token"];
         try {
-            const verifycode = verify(jwt, process.env.SECRET);
+			const verifycode = verify(jwt, process.env.SECRET);
+			// console.log(verifycode)
             return [true, verifycode];
         } catch (error) {
             res.status(403);

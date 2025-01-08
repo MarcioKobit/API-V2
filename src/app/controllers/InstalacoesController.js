@@ -8,6 +8,65 @@ import UsuarioRepository from '../repositories/UsuarioRepository.js';
 
 class InstalacoesController {
 
+	async logInstaladores(req, res) {
+
+		// const jwt = req.headers["authorization"] || req.headers["x-access-token"];
+		// const objAPI = await UsuarioRepository.validaToken(jwt);
+
+		// if (objAPI.length == 0) {
+		// 	var wArray = {
+		// 		STATUS: false,
+		// 		RECORDS: 1,
+		// 		DATA: [{
+		// 			MENSAGEM: 'Token Inválido'
+		// 		}]
+		// 	};
+		// 	res.json(wArray);
+		// 	res.end();
+		// 	return false;
+		// }
+
+		const { codusuario, idinstalacao } = req.query;
+
+		console.log(req.query)
+
+		var wArray = {};
+		wArray = {
+			STATUS: false,
+			RECORDS: 0,
+			DATA: []
+		};
+
+		if (codusuario != undefined && idinstalacao != '') {
+
+			const objLog = await InstalacoesRepository.findLogByIdAll(codusuario, idinstalacao)
+			// console.log(objInstalacao);
+			var wArrayData = [];
+			for (var i = 0; i < objLog.length; i++) {
+				var data = {
+					SEQUENCE: objLog[i].sequence,
+					ENDPOINT: objLog[i].endpoint,
+					DATREGISTRO: objLog[i].datRegistro,
+					JSON: objLog[i].json
+				}
+				wArrayData.push(data);
+			}
+
+			if (objLog.length > 0) {
+				wArray = {
+					STATUS: true,
+					RECORDS: objLog.length,
+					DATA: wArrayData
+				};
+
+			}
+
+		}
+
+		res.json(wArray);
+		res.end();
+	}
+
 
     async showInstalacoes(req, res) {
         // ####### Validacao do JWT #######
@@ -626,7 +685,7 @@ async function processaServFotos(reg) {
 				break;
 		}
 	} catch (error) {
-		console.log('Foto: ' + error)
+		// console.log('Foto: ' + error)
 		wArray = {
 			ID: reg.ID,
 			IDAPI: null,
