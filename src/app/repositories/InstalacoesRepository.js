@@ -83,8 +83,14 @@ class InstalacoesRepository {
 
 	findLogByID(endpoint) {
 		var sql = "";
-		sql += "select indLog from log_endpoint where endpoint = ? ";
+		sql += "select indLog from log_endpoint where endpoint = ? and codUsuario is null";
 		return consulta(sql, [endpoint], 'Erro findLogByID!')
+	}
+
+	findLogByIDUsuario(endpoint, codUsuario) {
+		var sql = "";
+		sql += "select indLog from log_endpoint where endpoint = ? and codUsuario = ?";
+		return consulta(sql, [endpoint, codUsuario], 'Erro findLogByIDUsuario!')
 	}
 
 	createlog(reg) {

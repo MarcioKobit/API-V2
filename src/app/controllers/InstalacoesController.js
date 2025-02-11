@@ -8,6 +8,41 @@ import UsuarioRepository from '../repositories/UsuarioRepository.js';
 
 class InstalacoesController {
 
+	async teste(req, res) {
+
+		// const jwt = req.headers["authorization"] || req.headers["x-access-token"];
+		// const objAPI = await UsuarioRepository.validaToken(jwt);
+
+		// if (objAPI.length == 0) {
+		// 	var wArray = {
+		// 		STATUS: false,
+		// 		RECORDS: 1,
+		// 		DATA: [{
+		// 			MENSAGEM: 'Token Inválido'
+		// 		}]
+		// 	};
+		// 	res.json(wArray);
+		// 	res.end();
+		// 	return false;
+		// }
+
+		const corpo = req.body;
+
+		console.log(JSON.stringify(corpo))
+
+		var wArray = {};
+		wArray = {
+			STATUS: true,
+			RECORDS: 0,
+			DATA: []
+		};
+
+
+		res.status(207).json(wArray);
+		res.end();
+	}
+
+
 	async logInstaladores(req, res) {
 
 		// const jwt = req.headers["authorization"] || req.headers["x-access-token"];
@@ -492,13 +527,24 @@ class InstalacoesController {
 		var wArray = {};
 
 
-		const row = await InstalacoesRepository.findLogByID('updateInstalacao');
-		var length = Object.keys(row).length;
+		const rowLog = await InstalacoesRepository.findLogByID('updateInstalacao');
+		var length = Object.keys(rowLog).length;
+		var reg = rowLog;
+
+		if (length == 0) {
+			const rowLog2 = await InstalacoesRepository.findLogByIDUsuario('updateInstalacao', id);
+			var length = Object.keys(rowLog2).length;
+
+			var reg = rowLog2;
+		}
+
+
 		if (length > 0) {
-			if (row[0].indLog == 'S') {
+			if (reg[0].indLog == 'S') {
 				var data = {
 					codUsuario: id,
 					endPoint: 'updateInstalacao',
+					idInstalacao: corpo.IDINSTALACAO,
 					json: JSON.stringify(corpo)
 				}
 
